@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <rect x="2" y="2" width="20" height="20" rx="4" fill="#1a1a2e"/>
+          <path d="M7 12l3 3 7-7" stroke="#ffe500" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h1>bing it</h1>
+      </div>
+      <span class="version">v2.0</span>
+    </header>
+
+    <div class="content">
+      <!-- ── Setup ── -->
+      <section id="setup">
+        <label for="count">How many searches?</label>
+        <div class="count-row">
+          <input type="range" id="count" min="5" max="90" value="30" step="1">
+          <span id="countVal" class="count-val">30</span>
+        </div>
+
+        <button id="startBtn" class="btn primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+          Bing it!
+        </button>
+      </section>
+
+      <!-- ── Progress ── -->
+      <section id="progress" class="hidden">
+        <div class="stat-row">
+          <span class="label">Progress</span>
+          <span id="progText" class="value">0 / 30</span>
+        </div>
+
+        <div class="bar-track">
+          <div id="progBar" class="bar-fill" style="width:0%"></div>
+        </div>
+
+        <div class="stat-row">
+          <span class="label">Status</span>
+          <span id="statusText" class="value status-chip">Starting&hellip;</span>
+        </div>
+
+        <div class="stat-row">
+          <span class="label">Current query</span>
+        </div>
+        <p id="queryText" class="query">&mdash;</p>
+
+        <div class="stat-row">
+          <span class="label">Trends loaded</span>
+          <span id="trendsText" class="value">&mdash;</span>
+        </div>
+
+        <div class="stat-row">
+          <span class="label">Elapsed</span>
+          <span id="elapsed" class="value">0:00</span>
+        </div>
+
+        <button id="stopBtn" class="btn danger">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+          Stop
+        </button>
+      </section>
+
+      <!-- ── Complete ── -->
+      <section id="done" class="hidden">
+        <div class="done-icon">&#10003;</div>
+        <p class="done-msg">All done! 🎉</p>
+        <p id="doneSummary" class="done-sub"></p>
+        <button id="resetBtn" class="btn outline">Bing it again</button>
+      </section>
+    </div>
+
+    <footer>
+      <span>Timer appears on the Bing tab</span>
+      <a id="openSettings" href="#">Settings</a>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

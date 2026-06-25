@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bing it — Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="title-row">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <rect x="2" y="2" width="20" height="20" rx="4" fill="#1a1a2e"/>
+          <path d="M7 12l3 3 7-7" stroke="#ffe500" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h1>Settings</h1>
+      </div>
+      <p class="subtitle">bing it v2.0</p>
+    </header>
+
+    <!-- Delay -->
+    <section class="card">
+      <h2>Delay Between Searches</h2>
+      <p class="card-hint">Random wait time after each search completes.</p>
+      <div class="field-row">
+        <label>Minimum</label>
+        <div class="input-group">
+          <input type="number" id="delayMin" min="10" max="600" value="36">
+          <span class="unit">sec</span>
+        </div>
+      </div>
+      <div class="field-row">
+        <label>Maximum</label>
+        <div class="input-group">
+          <input type="number" id="delayMax" min="10" max="600" value="108">
+          <span class="unit">sec</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Coffee break -->
+    <section class="card">
+      <h2>Coffee Break</h2>
+      <p class="card-hint">Longer pause every N searches to look natural.</p>
+      <div class="field-row toggle-row">
+        <label for="coffeeEnabled">Enable coffee break</label>
+        <label class="switch">
+          <input type="checkbox" id="coffeeEnabled" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div id="coffeeFields">
+        <div class="field-row">
+          <label>Take a break every</label>
+          <div class="input-group">
+            <input type="number" id="coffeeEvery" min="2" max="50" value="5">
+            <span class="unit">searches</span>
+          </div>
+        </div>
+        <div class="field-row">
+          <label>Minimum duration</label>
+          <div class="input-group">
+            <input type="number" id="coffeeMin" min="10" max="1800" value="180">
+            <span class="unit">sec</span>
+          </div>
+        </div>
+        <div class="field-row">
+          <label>Maximum duration</label>
+          <div class="input-group">
+            <input type="number" id="coffeeMax" min="10" max="1800" value="360">
+            <span class="unit">sec</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Behavior -->
+    <section class="card">
+      <h2>Behavior</h2>
+      <div class="field-row toggle-row">
+        <div>
+          <label for="includeDelay">Include delay in reading time</label>
+          <p class="field-hint">The delay timer starts when result scrolling begins, so total wait = max(reading, delay) instead of reading + delay. Makes sessions faster.</p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="includeDelay">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </section>
+
+    <div id="toast" class="toast hidden">Settings saved</div>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

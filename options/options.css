@@ -1,0 +1,179 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:       #ffffff;
+  --bg-card:  #fafafa;
+  --bg-input: #f3f4f6;
+  --text:     #1a1a2e;
+  --text-dim: #6b7280;
+  --brand:    #ffe500;
+  --accent:   #0c831f;
+  --success:  #0c831f;
+  --border:   #e5e7eb;
+  --radius:   12px;
+}
+
+body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 40px 24px 60px;
+}
+
+/* ── Header ───────────────────── */
+header { margin-bottom: 32px; }
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+h1 { font-size: 22px; font-weight: 800; color: var(--text); }
+.subtitle { font-size: 12px; color: var(--text-dim); font-weight: 600; }
+
+/* ── Card ─────────────────────── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.card h2 {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 2px;
+  color: var(--text);
+}
+.card-hint {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+}
+
+/* ── Fields ───────────────────── */
+.field-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.field-row:last-child { margin-bottom: 0; }
+.field-row label {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 600;
+}
+.field-hint {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+.input-group input[type="number"] {
+  width: 52px;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  text-align: center;
+  -moz-appearance: textfield;
+}
+.input-group input[type="number"]::-webkit-inner-spin-button,
+.input-group input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.unit {
+  font-size: 11px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+/* ── Toggle switch ────────────── */
+.toggle-row { gap: 16px; }
+.toggle-row > div { flex: 1; }
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
+}
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  cursor: pointer;
+  transition: background .25s, border-color .25s;
+}
+.slider::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  left: 3px;
+  bottom: 2px;
+  background: var(--text-dim);
+  border-radius: 50%;
+  transition: transform .25s, background .25s;
+}
+.switch input:checked + .slider {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.switch input:checked + .slider::before {
+  transform: translateX(18px);
+  background: #fff;
+}
+
+/* ── Coffee fields transition ── */
+#coffeeFields { transition: opacity .25s; }
+
+/* ── Toast ────────────────────── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--success);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(12,131,31,.25);
+  transition: opacity .3s, transform .3s;
+}
+.toast.hidden {
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+}
+
+/* ── Utility ──────────────────── */
+.hidden { opacity: 0; pointer-events: none; }
