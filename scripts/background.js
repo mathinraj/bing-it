@@ -366,4 +366,9 @@ chrome.tabs.onRemoved.addListener(async tabId => {
   if (s?.isRunning && s.tabId === tabId) await stopSession();
 });
 
-chrome.runtime.onInstalled.addListener(() => clearState());
+chrome.runtime.onInstalled.addListener(details => {
+  clearState();
+  if (details.reason === 'install') {
+    chrome.runtime.openOptionsPage();
+  }
+});
