@@ -16,12 +16,24 @@ const elTrends   = $('#trendsText');
 const elElapsed  = $('#elapsed');
 const elSummary  = $('#doneSummary');
 
-// ── Slider ──
-elSlider.addEventListener('input', () => { elCountVal.textContent = elSlider.value; });
+// ── Slider ↔ Input sync ──
+elSlider.addEventListener('input', () => {
+  elCountVal.value = elSlider.value;
+});
+elCountVal.addEventListener('input', () => {
+  const v = parseInt(elCountVal.value, 10);
+  if (!isNaN(v) && v >= 1) {
+    elSlider.value = Math.min(v, parseInt(elSlider.max, 10));
+  }
+});
+elCountVal.addEventListener('blur', () => {
+  const v = Math.max(1, Math.min(500, parseInt(elCountVal.value, 10) || 30));
+  elCountVal.value = v;
+});
 
 // ── Start ──
 elStartBtn.addEventListener('click', () => {
-  const count = parseInt(elSlider.value, 10);
+  const count = Math.max(1, parseInt(elCountVal.value, 10) || 30);
   elStartBtn.disabled = true;
   chrome.runtime.sendMessage({ action: 'startSession', count });
   showView('progress');

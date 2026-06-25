@@ -83,14 +83,26 @@ label {
   margin-bottom: 20px;
 }
 .count-val {
-  min-width: 36px;
+  width: 62px;
   text-align: center;
   font-weight: 800;
   font-size: 22px;
   color: var(--accent);
   background: rgba(12,131,31,.08);
-  padding: 4px 10px;
+  padding: 4px 6px;
   border-radius: 8px;
+  border: 1.5px solid transparent;
+  outline: none;
+  font-family: inherit;
+  -moz-appearance: textfield;
+  transition: border-color .2s;
+}
+.count-val:hover { border-color: var(--border); }
+.count-val:focus { border-color: var(--accent); background: rgba(12,131,31,.12); }
+.count-val::-webkit-inner-spin-button,
+.count-val::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 input[type="range"] {

@@ -22,15 +22,22 @@
     <!-- Delay -->
     <section class="card">
       <h2>Delay Between Searches</h2>
-      <p class="card-hint">Random wait time after each search completes.</p>
+      <p class="card-hint">Wait time after each search completes.</p>
+      <div class="field-row toggle-row">
+        <label for="delayFixed">Fixed delay (no randomization)</label>
+        <label class="switch">
+          <input type="checkbox" id="delayFixed">
+          <span class="slider"></span>
+        </label>
+      </div>
       <div class="field-row">
-        <label>Minimum</label>
+        <label id="delayMinLabel">Minimum</label>
         <div class="input-group">
           <input type="number" id="delayMin" min="10" max="600" value="36">
           <span class="unit">sec</span>
         </div>
       </div>
-      <div class="field-row">
+      <div class="field-row" id="delayMaxRow">
         <label>Maximum</label>
         <div class="input-group">
           <input type="number" id="delayMax" min="10" max="600" value="108">
@@ -58,14 +65,21 @@
             <span class="unit">searches</span>
           </div>
         </div>
+        <div class="field-row toggle-row">
+          <label for="coffeeFixed">Fixed duration (no randomization)</label>
+          <label class="switch">
+            <input type="checkbox" id="coffeeFixed">
+            <span class="slider"></span>
+          </label>
+        </div>
         <div class="field-row">
-          <label>Minimum duration</label>
+          <label id="coffeeMinLabel">Minimum duration</label>
           <div class="input-group">
             <input type="number" id="coffeeMin" min="10" max="1800" value="180">
             <span class="unit">sec</span>
           </div>
         </div>
-        <div class="field-row">
+        <div class="field-row" id="coffeeMaxRow">
           <label>Maximum duration</label>
           <div class="input-group">
             <input type="number" id="coffeeMax" min="10" max="1800" value="360">

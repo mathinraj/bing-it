@@ -5,10 +5,12 @@ const SETTINGS_KEY  = 'basSettings';
 const DEFAULT_SETTINGS = {
   delayMinSec: 36,
   delayMaxSec: 108,
+  delayFixed: false,
   coffeeBreakEnabled: true,
   coffeeBreakEvery: 5,
   coffeeBreakMinSec: 180,
   coffeeBreakMaxSec: 360,
+  coffeeBreakFixed: false,
   includeDelayInReading: false
 };
 
@@ -225,9 +227,13 @@ async function executeSearch() {
 
   let delaySec;
   if (onBreak) {
-    delaySec = randF(cfg.coffeeBreakMinSec, cfg.coffeeBreakMaxSec);
+    delaySec = cfg.coffeeBreakFixed
+      ? cfg.coffeeBreakMinSec
+      : randF(cfg.coffeeBreakMinSec, cfg.coffeeBreakMaxSec);
   } else {
-    delaySec = randF(cfg.delayMinSec, cfg.delayMaxSec);
+    delaySec = cfg.delayFixed
+      ? cfg.delayMinSec
+      : randF(cfg.delayMinSec, cfg.delayMaxSec);
     if (cfg.includeDelayInReading) {
       delaySec = Math.max(0, delaySec - readingDurationSec);
     }
