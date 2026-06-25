@@ -8,6 +8,7 @@ const DEFAULTS = {
   coffeeBreakMinSec: 180,
   coffeeBreakMaxSec: 360,
   coffeeBreakFixed: false,
+  scrollEnabled: true,
   includeDelayInReading: false
 };
 
@@ -25,6 +26,7 @@ const el = {
   coffeeMinLabel:document.getElementById('coffeeMinLabel'),
   coffeeMaxRow:  document.getElementById('coffeeMaxRow'),
   coffeeFields:  document.getElementById('coffeeFields'),
+  scrollEnabled: document.getElementById('scrollEnabled'),
   includeDelay:  document.getElementById('includeDelay'),
   toast:         document.getElementById('toast')
 };
@@ -40,9 +42,11 @@ chrome.storage.local.get(SETTINGS_KEY, d => {
   el.coffeeFixed.checked   = s.coffeeBreakFixed;
   el.coffeeMin.value       = s.coffeeBreakMinSec;
   el.coffeeMax.value       = s.coffeeBreakMaxSec;
+  el.scrollEnabled.checked = s.scrollEnabled;
   el.includeDelay.checked  = s.includeDelayInReading;
   syncDelayUI();
   syncCoffeeUI();
+  syncBehaviorUI();
 });
 
 function syncDelayUI() {
@@ -61,6 +65,13 @@ function syncCoffeeUI() {
   el.coffeeMinLabel.textContent = fixed ? 'Duration' : 'Minimum duration';
 }
 
+function syncBehaviorUI() {
+  const scrollOn = el.scrollEnabled.checked;
+  el.includeDelay.disabled = !scrollOn;
+  el.includeDelay.closest('.toggle-row').style.opacity = scrollOn ? '1' : '0.35';
+  if (!scrollOn) el.includeDelay.checked = false;
+}
+
 let toastTimer;
 function save() {
   const s = {
@@ -72,6 +83,7 @@ function save() {
     coffeeBreakFixed:    el.coffeeFixed.checked,
     coffeeBreakMinSec:   Math.max(10, +el.coffeeMin.value || DEFAULTS.coffeeBreakMinSec),
     coffeeBreakMaxSec:   Math.max(10, +el.coffeeMax.value || DEFAULTS.coffeeBreakMaxSec),
+    scrollEnabled:         el.scrollEnabled.checked,
     includeDelayInReading: el.includeDelay.checked
   };
   if (s.delayMaxSec < s.delayMinSec) s.delayMaxSec = s.delayMinSec;
@@ -88,6 +100,7 @@ document.querySelectorAll('input').forEach(inp => {
   inp.addEventListener('change', () => {
     if (inp === el.coffeeEnabled || inp === el.coffeeFixed) syncCoffeeUI();
     if (inp === el.delayFixed) syncDelayUI();
+    if (inp === el.scrollEnabled) syncBehaviorUI();
     save();
   });
 });

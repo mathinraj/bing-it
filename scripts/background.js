@@ -11,7 +11,8 @@ const DEFAULT_SETTINGS = {
   coffeeBreakMinSec: 180,
   coffeeBreakMaxSec: 360,
   coffeeBreakFixed: false,
-  includeDelayInReading: false
+  includeDelayInReading: false,
+  scrollEnabled: true
 };
 
 // ─── Utilities ───────────────────────────────────────────────
@@ -20,7 +21,7 @@ const sleep  = ms => new Promise(r => setTimeout(r, ms));
 const rand   = (lo, hi) => Math.floor(Math.random() * (hi - lo + 1)) + lo;
 const randF  = (lo, hi) => Math.random() * (hi - lo) + lo;
 
-let _nextTimer = null;  // tracks pending setTimeout for short delays
+let _nextTimer = null;
 
 function shuffle(arr) {
   const a = [...arr];
@@ -29,6 +30,11 @@ function shuffle(arr) {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+async function isStopped() {
+  const s = await getState();
+  return !s || !s.isRunning;
 }
 
 // ─── Settings ────────────────────────────────────────────────
@@ -189,29 +195,40 @@ async function executeSearch() {
 
     // 1 — navigate to Bing home
     await navigateAndWait(tabId, 'https://www.bing.com/');
+    if (await isStopped()) return;
     await sleep(rand(900, 2200));
 
     // 2 — type query
+    if (await isStopped()) return;
     await sendToTab(tabId, { action: 'type', query });
+    if (await isStopped()) return;
     await sleep(rand(250, 600));
 
     // 3 — submit
+    if (await isStopped()) return;
     chrome.tabs.sendMessage(tabId, { action: 'submit' }).catch(() => {});
 
     // 4 — wait for results
     await waitForComplete(tabId, 15000);
+    if (await isStopped()) return;
     await sleep(rand(1200, 2800));
 
-    // 5 — scroll / read (track duration for includeDelayInReading)
-    const readStart = Date.now();
-    state.status = 'reading';
-    await setState(state);
-    try { await sendToTab(tabId, { action: 'scroll' }); } catch { /* optional */ }
-    readingDurationSec = (Date.now() - readStart) / 1000;
+    // 5 — scroll / read (only if enabled)
+    if (cfg.scrollEnabled) {
+      if (await isStopped()) return;
+      const readStart = Date.now();
+      state.status = 'reading';
+      await setState(state);
+      try { await sendToTab(tabId, { action: 'scroll' }); } catch { /* optional */ }
+      readingDurationSec = (Date.now() - readStart) / 1000;
+    }
 
   } catch (e) {
     console.warn(`[BAS] search ${num} failed:`, e.message);
   }
+
+  // ── bail out if stopped during the search ──
+  if (await isStopped()) return;
 
   // ── update counters ──
   state.currentIndex++;
@@ -250,7 +267,6 @@ async function executeSearch() {
 
   if (onBreak) badge(state.currentIndex, state.totalSearches, '#eab308');
 
-  // chrome.alarms has a 30-second minimum; use setTimeout for shorter waits
   if (delaySec < 30) {
     _nextTimer = setTimeout(() => { _nextTimer = null; executeSearch(); }, delaySec * 1000);
   } else {
@@ -292,8 +308,13 @@ async function startSession(count) {
 async function stopSession() {
   await chrome.alarms.clear(ALARM_NAME);
   if (_nextTimer) { clearTimeout(_nextTimer); _nextTimer = null; }
+
   const state = await getState();
   if (state) {
+    // Tell the content script to abort any in-progress typing/scrolling
+    try { await chrome.tabs.sendMessage(state.tabId, { action: 'abort' }); }
+    catch { /* tab may be gone */ }
+
     state.isRunning = false;
     state.status = 'stopped';
     state.nextSearchAt = null;

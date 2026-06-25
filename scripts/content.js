@@ -1,6 +1,17 @@
 (() => {
-  const sleep = ms => new Promise(r => setTimeout(r, ms));
   const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+  // AbortController for cooperative cancellation of typing/scrolling
+  let _abort = new AbortController();
+
+  function sleep(ms) {
+    return new Promise((resolve, reject) => {
+      const sig = _abort.signal;
+      if (sig.aborted) { reject(new DOMException('Aborted', 'AbortError')); return; }
+      const t = setTimeout(resolve, ms);
+      sig.addEventListener('abort', () => { clearTimeout(t); reject(new DOMException('Aborted', 'AbortError')); }, { once: true });
+    });
+  }
 
   // ─── Search input helpers ─────────────────────────────────
 
@@ -104,6 +115,7 @@
 
   chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     if (msg.action === 'type') {
+      _abort = new AbortController();
       typeQuery(msg.query)
         .then(() => sendResponse({ success: true }))
         .catch(e => sendResponse({ success: false, error: e.message }));
@@ -115,10 +127,16 @@
       return false;
     }
     if (msg.action === 'scroll') {
+      _abort = new AbortController();
       simulateReading()
         .then(() => sendResponse({ success: true }))
         .catch(e => sendResponse({ success: false, error: e.message }));
       return true;
+    }
+    if (msg.action === 'abort') {
+      _abort.abort();
+      sendResponse({ ok: true });
+      return false;
     }
     if (msg.action === 'ping') {
       sendResponse({ alive: true });
@@ -245,7 +263,6 @@
     statusEl.textContent = STATUS_TEXT[state.status] || state.status;
   }
 
-  // Poll background for state and update the overlay
   let overlayPoll = null;
 
   async function initOverlay() {
