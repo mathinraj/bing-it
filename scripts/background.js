@@ -20,6 +20,8 @@ const sleep  = ms => new Promise(r => setTimeout(r, ms));
 const rand   = (lo, hi) => Math.floor(Math.random() * (hi - lo + 1)) + lo;
 const randF  = (lo, hi) => Math.random() * (hi - lo) + lo;
 
+let _nextTimer = null;  // tracks pending setTimeout for short delays
+
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -48,6 +50,7 @@ async function setState(s) {
 async function clearState() {
   await chrome.storage.local.remove(STATE_KEY);
   await chrome.alarms.clear(ALARM_NAME);
+  if (_nextTimer) { clearTimeout(_nextTimer); _nextTimer = null; }
   chrome.action.setBadgeText({ text: '' });
 }
 
@@ -239,15 +242,20 @@ async function executeSearch() {
     }
   }
 
-  const delayMin = Math.max(0.5, delaySec / 60);
+  delaySec = Math.max(2, delaySec);
 
   state.status       = onBreak ? 'break' : 'waiting';
-  state.nextSearchAt = Date.now() + delayMin * 60000;
+  state.nextSearchAt = Date.now() + delaySec * 1000;
   await setState(state);
 
   if (onBreak) badge(state.currentIndex, state.totalSearches, '#eab308');
 
-  chrome.alarms.create(ALARM_NAME, { delayInMinutes: delayMin });
+  // chrome.alarms has a 30-second minimum; use setTimeout for shorter waits
+  if (delaySec < 30) {
+    _nextTimer = setTimeout(() => { _nextTimer = null; executeSearch(); }, delaySec * 1000);
+  } else {
+    chrome.alarms.create(ALARM_NAME, { delayInMinutes: delaySec / 60 });
+  }
 }
 
 // ─── Session lifecycle ───────────────────────────────────────
@@ -283,6 +291,7 @@ async function startSession(count) {
 
 async function stopSession() {
   await chrome.alarms.clear(ALARM_NAME);
+  if (_nextTimer) { clearTimeout(_nextTimer); _nextTimer = null; }
   const state = await getState();
   if (state) {
     state.isRunning = false;
