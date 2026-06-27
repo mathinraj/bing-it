@@ -8,6 +8,7 @@ const DEFAULTS = {
   coffeeBreakMinSec: 180,
   coffeeBreakMaxSec: 360,
   coffeeBreakFixed: false,
+  useTrends: true,
   scrollEnabled: true,
   includeDelayInReading: false
 };
@@ -26,6 +27,7 @@ const el = {
   coffeeMinLabel:document.getElementById('coffeeMinLabel'),
   coffeeMaxRow:  document.getElementById('coffeeMaxRow'),
   coffeeFields:  document.getElementById('coffeeFields'),
+  useTrends:     document.getElementById('useTrends'),
   scrollEnabled: document.getElementById('scrollEnabled'),
   includeDelay:  document.getElementById('includeDelay'),
   toast:         document.getElementById('toast')
@@ -42,6 +44,7 @@ chrome.storage.local.get(SETTINGS_KEY, d => {
   el.coffeeFixed.checked   = s.coffeeBreakFixed;
   el.coffeeMin.value       = s.coffeeBreakMinSec;
   el.coffeeMax.value       = s.coffeeBreakMaxSec;
+  el.useTrends.checked     = s.useTrends;
   el.scrollEnabled.checked = s.scrollEnabled;
   el.includeDelay.checked  = s.includeDelayInReading;
   syncDelayUI();
@@ -83,6 +86,7 @@ function save() {
     coffeeBreakFixed:    el.coffeeFixed.checked,
     coffeeBreakMinSec:   Math.max(10, +el.coffeeMin.value || DEFAULTS.coffeeBreakMinSec),
     coffeeBreakMaxSec:   Math.max(10, +el.coffeeMax.value || DEFAULTS.coffeeBreakMaxSec),
+    useTrends:             el.useTrends.checked,
     scrollEnabled:         el.scrollEnabled.checked,
     includeDelayInReading: el.includeDelay.checked
   };

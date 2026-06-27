@@ -11,6 +11,7 @@ const DEFAULT_SETTINGS = {
   coffeeBreakMinSec: 180,
   coffeeBreakMaxSec: 360,
   coffeeBreakFixed: false,
+  useTrends: true,
   includeDelayInReading: false,
   scrollEnabled: true
 };
@@ -116,16 +117,20 @@ async function fetchTrends() {
 }
 
 async function loadFallback() {
+  const geo = detectCountryCode();
+  const file = geo === 'IN' ? 'assets/queries.json' : 'assets/queries-global.json';
   try {
-    const r = await fetch(chrome.runtime.getURL('assets/queries.json'));
+    const r = await fetch(chrome.runtime.getURL(file));
     return await r.json();
   } catch {
     return ['weather today', 'latest news', 'best recipes', 'how to'];
   }
 }
 
-async function buildQueries(count) {
-  const [trends, fallback] = await Promise.all([fetchTrends(), loadFallback()]);
+async function buildQueries(count, settings) {
+  const useTrends = settings ? settings.useTrends !== false : true;
+  const trends = useTrends ? await fetchTrends() : [];
+  const fallback = await loadFallback();
   const hasTrends = trends.length > 0;
   const pool = hasTrends
     ? [...shuffle(trends), ...shuffle(fallback)]
@@ -305,7 +310,7 @@ async function startSession(count) {
   await clearState();
 
   const settings = await loadSettings();
-  const { queries, hasTrends, trendCount } = await buildQueries(count);
+  const { queries, hasTrends, trendCount } = await buildQueries(count, settings);
   const tab = await chrome.tabs.create({ url: 'https://www.bing.com/', active: false });
 
   const state = {
