@@ -358,6 +358,9 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
       chrome.runtime.openOptionsPage();
       sendResponse({ ok: true });
       return false;
+    case 'clearState':
+      clearState().then(() => sendResponse({ ok: true }));
+      return true;
   }
 });
 

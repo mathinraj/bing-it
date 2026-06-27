@@ -46,8 +46,9 @@ elStopBtn.addEventListener('click', () => {
   elStartBtn.disabled = false;
 });
 
-// ── Reset ──
+// ── Reset (clear completed state from storage) ──
 elResetBtn.addEventListener('click', () => {
+  chrome.runtime.sendMessage({ action: 'clearState' });
   showView('setup');
   elStartBtn.disabled = false;
 });
