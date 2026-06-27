@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Bing it",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Automated Bing searches with human-like behavior — just Bing it!",
   "icons": {
     "16": "assets/icon16.png",

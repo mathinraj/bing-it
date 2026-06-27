@@ -192,13 +192,18 @@ async function executeSearch() {
   try {
     const tab = await ensureTab(state.tabId);
     const tabId = tab.id;
+    const onBing = (tab.url || '').includes('bing.com');
 
-    // 1 — navigate to Bing home
-    await navigateAndWait(tabId, 'https://www.bing.com/');
-    if (await isStopped()) return;
-    await sleep(rand(900, 2200));
+    // 1 — only navigate to Bing if we're not already there
+    if (!onBing) {
+      await navigateAndWait(tabId, 'https://www.bing.com/');
+      if (await isStopped()) return;
+      await sleep(rand(900, 2200));
+    } else {
+      await sleep(rand(400, 1000));
+    }
 
-    // 2 — type query
+    // 2 — type query into the existing search bar
     if (await isStopped()) return;
     await sendToTab(tabId, { action: 'type', query });
     if (await isStopped()) return;
