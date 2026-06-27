@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Bing it",
+  "name": "Bing it — Smart Auto Searcher",
   "version": "1.3.0",
   "description": "Automated Bing searches with human-like behavior — just Bing it!",
   "icons": {
