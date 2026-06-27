@@ -3,9 +3,51 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bing it — Smart Auto Searcher</title>
-  <meta name="description" content="Automated Bing searches with human-like behavior. Human typing, scrolling, coffee breaks & Google Trends integration.">
+  <title>Bing it — Smart Auto Searcher | Automate Bing Searches with Human-like Behavior</title>
+  <meta name="description" content="Bing it is a browser extension that automates Bing searches with human-like typing, natural scrolling, coffee breaks, and Google Trends integration. Works on Edge & Chrome.">
+  <meta name="keywords" content="bing auto search, bing rewards automation, microsoft rewards, bing search extension, auto searcher, bing it extension, chrome extension, edge extension">
+  <meta name="author" content="Mathinraj">
+  <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#ffe500">
+  <link rel="canonical" href="https://bingit.vercel.app/">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bingit.vercel.app/">
+  <meta property="og:title" content="Bing it — Smart Auto Searcher">
+  <meta property="og:description" content="Automate Bing searches with human-like typing, scrolling, coffee breaks & Google Trends. Set it and forget it.">
+  <meta property="og:site_name" content="Bing it">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Bing it — Smart Auto Searcher">
+  <meta name="twitter:description" content="Automate Bing searches with human-like typing, scrolling, coffee breaks & Google Trends. Set it and forget it.">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Bing it — Smart Auto Searcher",
+    "description": "A browser extension that automates Bing searches with human-like behavior including natural typing, scrolling, coffee breaks, and Google Trends integration.",
+    "applicationCategory": "BrowserApplication",
+    "operatingSystem": "Windows, macOS, Linux",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "Mathinraj",
+      "url": "https://www.linkedin.com/in/mathinraj/"
+    },
+    "softwareVersion": "1.3.0",
+    "url": "https://bingit.vercel.app/"
+  }
+  </script>
+
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'><rect width='128' height='128' rx='26' fill='%23FFE500'/><path d='M36 66L52 82L92 42' stroke='%231a1a2e' stroke-width='12' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -500,9 +542,9 @@
 </head>
 <body>
   <!-- Navigation -->
-  <nav>
+  <nav aria-label="Main navigation">
     <div class="nav-inner">
-      <a href="#" class="nav-brand">
+      <a href="#" class="nav-brand" aria-label="Bing it - Home">
         <svg width="32" height="32" viewBox="0 0 128 128">
           <rect width="128" height="128" rx="26" fill="#FFE500"/>
           <path d="M36 66L52 82L92 42" stroke="#1a1a2e" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
@@ -521,6 +563,7 @@
   </nav>
 
   <!-- Hero -->
+  <main>
   <section class="hero">
     <div class="hero-badge">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
@@ -666,6 +709,8 @@
       </span>
     </div>
   </section>
+
+  </main>
 
   <!-- Footer -->
   <footer>
