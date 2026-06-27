@@ -69,29 +69,49 @@ function badge(cur, total, color = '#06b6d4') {
 
 // ─── Google Trends ───────────────────────────────────────────
 
+function detectCountryCode() {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+    const locale = Intl.DateTimeFormat().resolvedOptions().locale || navigator.language || 'en-US';
+    const tzToGeo = {
+      'Asia/Kolkata': 'IN', 'Asia/Calcutta': 'IN', 'Asia/Mumbai': 'IN',
+      'Europe/London': 'GB', 'Europe/Dublin': 'GB',
+      'America/New_York': 'US', 'America/Chicago': 'US', 'America/Denver': 'US',
+      'America/Los_Angeles': 'US', 'America/Phoenix': 'US',
+      'America/Toronto': 'CA', 'America/Vancouver': 'CA',
+      'Australia/Sydney': 'AU', 'Australia/Melbourne': 'AU', 'Australia/Perth': 'AU',
+      'Europe/Berlin': 'DE', 'Europe/Paris': 'FR', 'Europe/Rome': 'IT',
+      'Europe/Madrid': 'ES', 'Asia/Tokyo': 'JP', 'Asia/Singapore': 'SG',
+      'Asia/Dubai': 'AE', 'Asia/Riyadh': 'SA', 'Asia/Shanghai': 'CN',
+      'Asia/Seoul': 'KR', 'America/Sao_Paulo': 'BR', 'America/Mexico_City': 'MX',
+      'Africa/Johannesburg': 'ZA', 'Pacific/Auckland': 'NZ',
+      'Europe/Amsterdam': 'NL', 'Europe/Zurich': 'CH', 'Europe/Stockholm': 'SE',
+      'Asia/Jakarta': 'ID', 'Asia/Manila': 'PH', 'Asia/Bangkok': 'TH',
+      'Asia/Karachi': 'PK', 'Asia/Dhaka': 'BD', 'Asia/Colombo': 'LK'
+    };
+    if (tzToGeo[tz]) return tzToGeo[tz];
+    const region = locale.split('-')[1] || locale.split('_')[1];
+    if (region && region.length === 2) return region.toUpperCase();
+  } catch { /* fallback below */ }
+  return 'US';
+}
+
 async function fetchTrends() {
-  const urls = [
-    'https://trends.google.com/trends/api/dailytrends?hl=en-US&tz=300&geo=US&ns=15',
-    'https://trends.google.com/trends/api/dailytrends?hl=en-US&tz=0&geo=US&ns=15'
-  ];
-  for (const url of urls) {
-    try {
-      const r = await fetch(url);
-      if (!r.ok) continue;
-      const txt = await r.text();
-      const json = JSON.parse(txt.substring(txt.indexOf('\n') + 1));
-      const out = [];
-      for (const day of json.default.trendingSearchesDays) {
-        for (const ts of day.trendingSearches) {
-          out.push(ts.title.query);
-          for (const a of (ts.articles || [])) {
-            if (a.title && a.title.length < 80) out.push(a.title);
-          }
-        }
-      }
-      if (out.length) return [...new Set(out)];
-    } catch { /* try next */ }
-  }
+  const geo = detectCountryCode();
+  const url = `https://trends.google.com/trending/rss?geo=${geo}`;
+
+  try {
+    const r = await fetch(url);
+    if (!r.ok) return [];
+    const txt = await r.text();
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(txt, 'text/xml');
+    const items = xml.querySelectorAll('item > title');
+    const queries = [...items]
+      .map(el => el.textContent.trim())
+      .filter(t => t.length > 0 && t.length < 80);
+    if (queries.length) return [...new Set(queries)];
+  } catch { /* silent fail, use fallback */ }
   return [];
 }
 
