@@ -2,6 +2,25 @@
 
 A Manifest V3 browser extension that automates Bing searches with human-like behavior. Works on **Microsoft Edge** and **Google Chrome**.
 
+[![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-Install-green?logo=googlechrome&logoColor=white)](https://chrome.google.com/webstore/detail/gldhjncdmgpileambimhpjmeoejgclen)
+[![Website](https://img.shields.io/badge/Website-bingit.vercel.app-yellow)](https://bingit.vercel.app)
+
+## Install
+
+**From the Chrome Web Store (recommended):**
+
+[**Install Bing it**](https://chrome.google.com/webstore/detail/gldhjncdmgpileambimhpjmeoejgclen)
+
+**Manual install (developer mode):**
+
+1. Clone or download this repository
+2. Open your browser's extension management page:
+   - **Edge**: `edge://extensions/`
+   - **Chrome**: `chrome://extensions/`
+3. Enable **Developer mode** (toggle in the top-right corner)
+4. Click **Load unpacked** and select the project folder
+5. Pin the extension to your toolbar for easy access
+
 ## Features
 
 - **Human-like typing** — characters typed one-by-one with variable delays (45–580 ms), including occasional "thinking" pauses
@@ -14,16 +33,6 @@ A Manifest V3 browser extension that automates Bing searches with human-like beh
 - **500+ fallback queries** — diverse built-in pool across 20+ categories when Trends is unavailable
 - **Background execution** — searches run in an inactive tab so you can keep using your browser
 
-## Installation
-
-1. Clone or download this repository
-2. Open your browser's extension management page:
-   - **Edge**: `edge://extensions/`
-   - **Chrome**: `chrome://extensions/`
-3. Enable **Developer mode** (toggle in the top-right corner)
-4. Click **Load unpacked** and select the project folder
-5. Pin the extension to your toolbar for easy access
-
 ## Usage
 
 1. **Sign in** to your Microsoft account in the browser before starting
@@ -34,28 +43,6 @@ A Manifest V3 browser extension that automates Bing searches with human-like beh
    - Coffee break on/off, frequency, duration (seconds)
    - Include delay in reading time (overlaps wait with scrolling)
 5. Click **Stop** at any time to cancel
-
-## Project Structure
-
-```
-bing-it/
-├── manifest.json              # MV3 extension manifest
-├── README.md
-├── .gitignore
-├── scripts/
-│   ├── background.js          # Service worker — orchestration, alarms, Trends API
-│   └── content.js             # Bing page — typing, scrolling, floating overlay
-├── popup/
-│   ├── popup.html             # Extension popup UI
-│   ├── popup.js               # Start/stop, progress rendering
-│   └── popup.css              # Blinkit-inspired light theme
-├── options/
-│   ├── options.html           # Settings page
-│   ├── options.js             # Settings logic (auto-save)
-│   └── options.css            # Settings styles
-└── assets/
-    └── queries.json           # 500+ fallback search queries
-```
 
 ## Disclaimer
 
