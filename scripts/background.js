@@ -1,4 +1,5 @@
 const ALARM_NAME    = 'bas-next-search';
+const WATCHDOG_NAME = 'bas-watchdog';
 const STATE_KEY     = 'searchState';
 const SETTINGS_KEY  = 'basSettings';
 
@@ -22,7 +23,7 @@ const sleep  = ms => new Promise(r => setTimeout(r, ms));
 const rand   = (lo, hi) => Math.floor(Math.random() * (hi - lo + 1)) + lo;
 const randF  = (lo, hi) => Math.random() * (hi - lo) + lo;
 
-let _nextTimer = null;
+let _executing = false;
 
 function shuffle(arr) {
   const a = [...arr];
@@ -36,6 +37,43 @@ function shuffle(arr) {
 async function isStopped() {
   const s = await getState();
   return !s || !s.isRunning;
+}
+
+// ─── Keepalive ───────────────────────────────────────────────
+// Prevents the MV3 service worker from being terminated during
+// active search execution by holding an open port.
+
+let _keepalivePort = null;
+
+function startKeepalive() {
+  if (_keepalivePort) return;
+  try {
+    _keepalivePort = chrome.runtime.connect({ name: 'keepalive' });
+    _keepalivePort.onDisconnect.addListener(() => {
+      _keepalivePort = null;
+      if (_executing) setTimeout(startKeepalive, 0);
+    });
+  } catch { _keepalivePort = null; }
+}
+
+function stopKeepalive() {
+  if (_keepalivePort) {
+    try { _keepalivePort.disconnect(); } catch {}
+    _keepalivePort = null;
+  }
+}
+
+// ─── Watchdog alarm ──────────────────────────────────────────
+// Fires every 25 seconds while a session is running. If the
+// service worker was killed and restarted, this ensures it
+// resumes execution when the scheduled time has passed.
+
+function startWatchdog() {
+  chrome.alarms.create(WATCHDOG_NAME, { periodInMinutes: 25 / 60 });
+}
+
+function stopWatchdog() {
+  chrome.alarms.clear(WATCHDOG_NAME);
 }
 
 // ─── Settings ────────────────────────────────────────────────
@@ -57,7 +95,8 @@ async function setState(s) {
 async function clearState() {
   await chrome.storage.local.remove(STATE_KEY);
   await chrome.alarms.clear(ALARM_NAME);
-  if (_nextTimer) { clearTimeout(_nextTimer); _nextTimer = null; }
+  stopWatchdog();
+  stopKeepalive();
   chrome.action.setBadgeText({ text: '' });
 }
 
@@ -199,108 +238,106 @@ async function sendToTab(tabId, msg, retries = 5) {
 // ─── Search execution ────────────────────────────────────────
 
 async function executeSearch() {
-  const state = await getState();
-  if (!state || !state.isRunning) return;
-  if (state.currentIndex >= state.totalSearches) { await finishSession(); return; }
-
-  const query = state.queries[state.currentIndex];
-  const num   = state.currentIndex + 1;
-  const cfg   = state.settings || DEFAULT_SETTINGS;
-
-  state.status    = 'searching';
-  state.lastQuery = query;
-  await setState(state);
-  badge(num, state.totalSearches);
-
-  let readingDurationSec = 0;
+  if (_executing) return;
+  _executing = true;
+  startKeepalive();
 
   try {
-    const tab = await ensureTab(state.tabId);
-    const tabId = tab.id;
-    const onBing = (tab.url || '').includes('bing.com');
+    const state = await getState();
+    if (!state || !state.isRunning) return;
+    if (state.currentIndex >= state.totalSearches) { await finishSession(); return; }
 
-    // 1 — only navigate to Bing if we're not already there
-    if (!onBing) {
-      await navigateAndWait(tabId, 'https://www.bing.com/');
-      if (await isStopped()) return;
-      await sleep(rand(900, 2200));
-    } else {
-      await sleep(rand(400, 1000));
-    }
+    const query = state.queries[state.currentIndex];
+    const num   = state.currentIndex + 1;
+    const cfg   = state.settings || DEFAULT_SETTINGS;
 
-    // 2 — type query into the existing search bar
-    if (await isStopped()) return;
-    await sendToTab(tabId, { action: 'type', query });
-    if (await isStopped()) return;
-    await sleep(rand(250, 600));
-
-    // 3 — submit
-    if (await isStopped()) return;
-    chrome.tabs.sendMessage(tabId, { action: 'submit' }).catch(() => {});
-
-    // 4 — wait for results
-    await waitForComplete(tabId, 15000);
-    if (await isStopped()) return;
-    await sleep(rand(1200, 2800));
-
-    // 5 — scroll / read (only if enabled)
-    if (cfg.scrollEnabled) {
-      if (await isStopped()) return;
-      const readStart = Date.now();
-      state.status = 'reading';
-      await setState(state);
-      try { await sendToTab(tabId, { action: 'scroll' }); } catch { /* optional */ }
-      readingDurationSec = (Date.now() - readStart) / 1000;
-    }
-
-  } catch (e) {
-    console.warn(`[BAS] search ${num} failed:`, e.message);
-  }
-
-  // ── bail out if stopped during the search ──
-  if (await isStopped()) return;
-
-  // ── update counters ──
-  state.currentIndex++;
-  state.searchesCompleted = state.currentIndex;
-
-  if (state.currentIndex >= state.totalSearches) {
+    state.status    = 'searching';
+    state.lastQuery = query;
     await setState(state);
-    await finishSession();
-    return;
-  }
+    badge(num, state.totalSearches);
 
-  // ── schedule next search ──
-  const onBreak = cfg.coffeeBreakEnabled
-    && state.currentIndex > 0
-    && (state.currentIndex % cfg.coffeeBreakEvery === 0);
+    let readingDurationSec = 0;
 
-  let delaySec;
-  if (onBreak) {
-    delaySec = cfg.coffeeBreakFixed
-      ? cfg.coffeeBreakMinSec
-      : randF(cfg.coffeeBreakMinSec, cfg.coffeeBreakMaxSec);
-  } else {
-    delaySec = cfg.delayFixed
-      ? cfg.delayMinSec
-      : randF(cfg.delayMinSec, cfg.delayMaxSec);
-    if (cfg.includeDelayInReading) {
-      delaySec = Math.max(0, delaySec - readingDurationSec);
+    try {
+      const tab = await ensureTab(state.tabId);
+      const tabId = tab.id;
+      const onBing = (tab.url || '').includes('bing.com');
+
+      if (!onBing) {
+        await navigateAndWait(tabId, 'https://www.bing.com/');
+        if (await isStopped()) return;
+        await sleep(rand(900, 2200));
+      } else {
+        await sleep(rand(400, 1000));
+      }
+
+      if (await isStopped()) return;
+      await sendToTab(tabId, { action: 'type', query });
+      if (await isStopped()) return;
+      await sleep(rand(250, 600));
+
+      if (await isStopped()) return;
+      chrome.tabs.sendMessage(tabId, { action: 'submit' }).catch(() => {});
+
+      await waitForComplete(tabId, 15000);
+      if (await isStopped()) return;
+      await sleep(rand(1200, 2800));
+
+      if (cfg.scrollEnabled) {
+        if (await isStopped()) return;
+        const readStart = Date.now();
+        state.status = 'reading';
+        await setState(state);
+        try { await sendToTab(tabId, { action: 'scroll' }); } catch { /* optional */ }
+        readingDurationSec = (Date.now() - readStart) / 1000;
+      }
+
+    } catch (e) {
+      console.warn(`[BAS] search ${num} failed:`, e.message);
     }
-  }
 
-  delaySec = Math.max(2, delaySec);
+    if (await isStopped()) return;
 
-  state.status       = onBreak ? 'break' : 'waiting';
-  state.nextSearchAt = Date.now() + delaySec * 1000;
-  await setState(state);
+    state.currentIndex++;
+    state.searchesCompleted = state.currentIndex;
 
-  if (onBreak) badge(state.currentIndex, state.totalSearches, '#eab308');
+    if (state.currentIndex >= state.totalSearches) {
+      await setState(state);
+      await finishSession();
+      return;
+    }
 
-  if (delaySec < 30) {
-    _nextTimer = setTimeout(() => { _nextTimer = null; executeSearch(); }, delaySec * 1000);
-  } else {
-    chrome.alarms.create(ALARM_NAME, { delayInMinutes: delaySec / 60 });
+    // ── schedule next search via chrome.alarms (survives worker termination) ──
+    const onBreak = cfg.coffeeBreakEnabled
+      && state.currentIndex > 0
+      && (state.currentIndex % cfg.coffeeBreakEvery === 0);
+
+    let delaySec;
+    if (onBreak) {
+      delaySec = cfg.coffeeBreakFixed
+        ? cfg.coffeeBreakMinSec
+        : randF(cfg.coffeeBreakMinSec, cfg.coffeeBreakMaxSec);
+    } else {
+      delaySec = cfg.delayFixed
+        ? cfg.delayMinSec
+        : randF(cfg.delayMinSec, cfg.delayMaxSec);
+      if (cfg.includeDelayInReading) {
+        delaySec = Math.max(0, delaySec - readingDurationSec);
+      }
+    }
+
+    delaySec = Math.max(2, delaySec);
+
+    state.status       = onBreak ? 'break' : 'waiting';
+    state.nextSearchAt = Date.now() + delaySec * 1000;
+    await setState(state);
+
+    if (onBreak) badge(state.currentIndex, state.totalSearches, '#eab308');
+
+    chrome.alarms.create(ALARM_NAME, { delayInMinutes: Math.max(0.08, delaySec / 60) });
+  } finally {
+    _executing = false;
+    stopKeepalive();
   }
 }
 
@@ -330,6 +367,7 @@ async function startSession(count) {
   };
   await setState(state);
   badge(0, count);
+  startWatchdog();
 
   await sleep(rand(2000, 3500));
   await executeSearch();
@@ -337,11 +375,11 @@ async function startSession(count) {
 
 async function stopSession() {
   await chrome.alarms.clear(ALARM_NAME);
-  if (_nextTimer) { clearTimeout(_nextTimer); _nextTimer = null; }
+  stopWatchdog();
+  stopKeepalive();
 
   const state = await getState();
   if (state) {
-    // Tell the content script to abort any in-progress typing/scrolling
     try { await chrome.tabs.sendMessage(state.tabId, { action: 'abort' }); }
     catch { /* tab may be gone */ }
 
@@ -355,6 +393,9 @@ async function stopSession() {
 
 async function finishSession() {
   await chrome.alarms.clear(ALARM_NAME);
+  stopWatchdog();
+  stopKeepalive();
+
   const state = await getState();
   if (state) {
     state.isRunning = false;
@@ -369,8 +410,18 @@ async function finishSession() {
 
 // ─── Event wiring ────────────────────────────────────────────
 
-chrome.alarms.onAlarm.addListener(alarm => {
-  if (alarm.name === ALARM_NAME) executeSearch();
+chrome.alarms.onAlarm.addListener(async alarm => {
+  if (alarm.name === ALARM_NAME) {
+    executeSearch();
+  } else if (alarm.name === WATCHDOG_NAME) {
+    // Recovery: if a scheduled search was missed, trigger it now
+    if (_executing) return;
+    const state = await getState();
+    if (!state || !state.isRunning) { stopWatchdog(); return; }
+    if (state.nextSearchAt && Date.now() >= state.nextSearchAt) {
+      executeSearch();
+    }
+  }
 });
 
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
@@ -403,5 +454,16 @@ chrome.runtime.onInstalled.addListener(details => {
   clearState();
   if (details.reason === 'install') {
     chrome.runtime.openOptionsPage();
+  }
+});
+
+// Resume watchdog if browser restarts with an active session
+chrome.runtime.onStartup.addListener(async () => {
+  const state = await getState();
+  if (state && state.isRunning) {
+    startWatchdog();
+    if (state.nextSearchAt && Date.now() >= state.nextSearchAt) {
+      executeSearch();
+    }
   }
 });
