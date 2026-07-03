@@ -177,3 +177,22 @@ h1 { font-size: 22px; font-weight: 800; color: var(--text); }
 
 /* ── Utility ──────────────────── */
 .hidden { opacity: 0; pointer-events: none; }
+
+/* ── Footer ──────────────────── */
+.options-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px 0 8px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.options-footer a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color .2s;
+}
+.options-footer a:hover { color: var(--accent); }
+.footer-dot { color: var(--text-dim); }
