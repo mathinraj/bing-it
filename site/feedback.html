@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feedback — Bing it</title>
+  <meta name="description" content="Report bugs, request features, or share feedback about the Bing it extension.">
+  <meta name="theme-color" content="#ffe500">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'><rect width='128' height='128' rx='26' fill='%23FFE500'/><path d='M36 66L52 82L92 42' stroke='%231a1a2e' stroke-width='12' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #fafafa;
+      --bg-card: #ffffff;
+      --text: #1a1a2e;
+      --text-dim: #6b7280;
+      --brand: #ffe500;
+      --brand-dark: #e6cf00;
+      --accent: #0c831f;
+      --accent-light: rgba(12,131,31,.08);
+      --danger: #e23744;
+      --warning: #f59e0b;
+      --purple: #6c5ce7;
+      --border: #e5e7eb;
+      --radius: 12px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
+      --shadow-md: 0 4px 20px rgba(0,0,0,.08);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── Nav ─────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+    }
+    .nav-inner {
+      max-width: 700px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+    }
+    .nav-brand span {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .nav-back {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .nav-back:hover { color: var(--text); }
+
+    /* ── Main ────────────────────────── */
+    main {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 100px 24px 60px;
+    }
+
+    .page-header {
+      margin-bottom: 32px;
+    }
+    .page-header h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+    .page-header p {
+      font-size: 15px;
+      color: var(--text-dim);
+    }
+
+    /* ── Uninstall banner ────────────── */
+    .uninstall-banner {
+      background: linear-gradient(135deg, #fff9db 0%, #fff3bf 100%);
+      border: 1px solid var(--brand-dark);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 28px;
+      display: none;
+    }
+    .uninstall-banner.visible { display: block; }
+    .uninstall-banner h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .uninstall-banner p {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    /* ── Type picker ─────────────────── */
+    .type-picker {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .type-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 12px;
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all .2s;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-dim);
+    }
+    .type-btn:hover { border-color: #d1d5db; }
+    .type-btn.selected { color: var(--text); }
+    .type-btn[data-type="bug"].selected {
+      border-color: var(--danger);
+      background: rgba(226,55,68,.04);
+    }
+    .type-btn[data-type="feature"].selected {
+      border-color: var(--warning);
+      background: rgba(245,158,11,.04);
+    }
+    .type-btn[data-type="feedback"].selected {
+      border-color: var(--purple);
+      background: rgba(108,92,231,.04);
+    }
+    .type-icon {
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    /* ── Form ────────────────────────── */
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text);
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .form-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(12,131,31,.08);
+    }
+    .form-input::placeholder { color: #9ca3af; }
+    textarea.form-input {
+      resize: vertical;
+      min-height: 120px;
+      line-height: 1.6;
+    }
+    .form-input.error {
+      border-color: var(--danger);
+    }
+    .form-error {
+      font-size: 12px;
+      color: var(--danger);
+      margin-top: 6px;
+    }
+
+    /* ── Submit button ────────────────── */
+    .btn-submit {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--accent);
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background .2s, transform .1s, box-shadow .2s;
+      box-shadow: 0 4px 12px rgba(12,131,31,.2);
+    }
+    .btn-submit:hover:not(:disabled) {
+      background: #0a6e1a;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(12,131,31,.3);
+    }
+    .btn-submit:active { transform: scale(.98); }
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* ── Success state ────────────────── */
+    .success-card {
+      text-align: center;
+      padding: 48px 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow-md);
+    }
+    .success-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      background: var(--accent-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+    .success-card h2 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .success-card p {
+      font-size: 14px;
+      color: var(--text-dim);
+      margin-bottom: 24px;
+    }
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+      background: transparent;
+      border: 2px solid var(--accent);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-outline:hover { background: var(--accent-light); }
+
+    /* ── Toast ────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      padding: 12px 24px;
+      background: var(--text);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.2);
+      opacity: 0;
+      transition: opacity .3s, transform .3s;
+      pointer-events: none;
+      z-index: 1000;
+    }
+    .toast.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .toast.error { background: var(--danger); }
+
+    /* ── Footer ───────────────────────── */
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    footer a:hover { text-decoration: underline; }
+
+    /* ── Responsive ───────────────────── */
+    @media (max-width: 520px) {
+      .type-picker { grid-template-columns: 1fr; }
+      main { padding: 90px 16px 40px; }
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 128 128">
+          <rect width="128" height="128" rx="26" fill="#FFE500"/>
+          <path d="M36 66L52 82L92 42" stroke="#1a1a2e" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <span>bing it</span>
+      </a>
+      <a href="/" class="nav-back">&larr; Back to home</a>
+    </div>
+  </nav>
+
+  <main>
+    <!-- Uninstall banner (shown via ?ref=uninstall) -->
+    <div class="uninstall-banner" id="uninstallBanner">
+      <h3>We're sorry to see you go!</h3>
+      <p>Would you take a moment to let us know why you uninstalled? Your feedback helps us improve.</p>
+    </div>
+
+    <div class="page-header">
+      <h1>Send Feedback</h1>
+      <p>Found a bug? Have a feature idea? Or just want to say something? We'd love to hear from you.</p>
+    </div>
+
+    <!-- Form -->
+    <form id="feedbackForm">
+      <div class="type-picker">
+        <button type="button" class="type-btn selected" data-type="bug">
+          <span class="type-icon">&#128027;</span>
+          Bug Report
+        </button>
+        <button type="button" class="type-btn" data-type="feature">
+          <span class="type-icon">&#128161;</span>
+          Feature Request
+        </button>
+        <button type="button" class="type-btn" data-type="feedback">
+          <span class="type-icon">&#128172;</span>
+          General Feedback
+        </button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" id="msgLabel">Describe the issue</label>
+        <textarea class="form-input" id="message" placeholder="What happened? What did you expect to happen?" rows="5" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email (optional)</label>
+        <input type="email" class="form-input" id="email" placeholder="your@email.com — only if you'd like a reply">
+        <p class="form-error hidden" id="emailError">Please enter a valid email address</p>
+      </div>
+
+      <button type="submit" class="btn-submit" id="submitBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Send Feedback
+      </button>
+    </form>
+
+    <!-- Success -->
+    <div class="success-card hidden" id="successCard">
+      <div class="success-icon">&#10003;</div>
+      <h2>Feedback Sent!</h2>
+      <p>Thank you for taking the time to share your thoughts. It helps make Bing it better.</p>
+      <button type="button" class="btn-outline" id="resetBtn">Send Another</button>
+    </div>
+  </main>
+
+  <footer>
+    <p>Built by <a href="https://mathinraj.is-a.dev" target="_blank">Mathinraj</a></p>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- Vercel Analytics -->
+  <script defer src="/_vercel/insights/script.js"></script>
+
+  <script>
+    const SERVICE_ID  = 'service_em2o2a6';
+    const TEMPLATE_ID = 'template_zb1flng';
+    const PUBLIC_KEY  = 'R2Yro3gG1FbXS9fJm';
+
+    emailjs.init(PUBLIC_KEY);
+
+    const form       = document.getElementById('feedbackForm');
+    const msgInput   = document.getElementById('message');
+    const msgLabel   = document.getElementById('msgLabel');
+    const emailInput = document.getElementById('email');
+    const emailError = document.getElementById('emailError');
+    const submitBtn  = document.getElementById('submitBtn');
+    const successCard = document.getElementById('successCard');
+    const resetBtn   = document.getElementById('resetBtn');
+    const toast      = document.getElementById('toast');
+    const typeBtns   = document.querySelectorAll('.type-btn');
+    const banner     = document.getElementById('uninstallBanner');
+
+    let selectedType = 'bug';
+
+    // Show uninstall banner if referred from extension uninstall
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('ref') === 'uninstall') {
+      banner.classList.add('visible');
+      selectedType = 'feedback';
+      typeBtns.forEach(b => b.classList.remove('selected'));
+      document.querySelector('[data-type="feedback"]').classList.add('selected');
+      updateLabel();
+    }
+
+    // Type picker
+    typeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        typeBtns.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedType = btn.dataset.type;
+        updateLabel();
+      });
+    });
+
+    function updateLabel() {
+      const labels = {
+        bug: 'Describe the issue',
+        feature: 'Describe your idea',
+        feedback: 'Your message'
+      };
+      const placeholders = {
+        bug: 'What happened? What did you expect to happen?',
+        feature: 'What feature would you like? How would it help you?',
+        feedback: 'Tell us what you think...'
+      };
+      msgLabel.textContent = labels[selectedType];
+      msgInput.placeholder = placeholders[selectedType];
+    }
+
+    function showToast(msg, isError = false) {
+      toast.textContent = msg;
+      toast.classList.toggle('error', isError);
+      toast.classList.add('visible');
+      setTimeout(() => toast.classList.remove('visible'), 4000);
+    }
+
+    function isValidEmail(val) {
+      return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(val);
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msg = msgInput.value.trim();
+      const email = emailInput.value.trim();
+
+      if (!msg) return;
+
+      if (email && !isValidEmail(email)) {
+        emailError.classList.remove('hidden');
+        emailInput.classList.add('error');
+        return;
+      }
+
+      emailError.classList.add('hidden');
+      emailInput.classList.remove('error');
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Sending...';
+
+      const typeLabels = { bug: 'Bug Report', feature: 'Feature Request', feedback: 'General Feedback' };
+      const source = params.get('ref') === 'uninstall' ? ' [Uninstall Feedback]' : '';
+
+      try {
+        const result = await emailjs.send(SERVICE_ID, TEMPLATE_ID, {
+          feedback_type: typeLabels[selectedType] + source,
+          message: msg,
+          user_email: email || 'Not provided',
+        });
+
+        if (result.status === 200) {
+          form.classList.add('hidden');
+          successCard.classList.remove('hidden');
+          document.querySelector('.page-header').classList.add('hidden');
+        } else {
+          showToast('Something went wrong. Please try again.', true);
+        }
+      } catch (err) {
+        showToast('Failed to send. Please try again later.', true);
+        console.error('EmailJS error:', err);
+      }
+
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send Feedback';
+    });
+
+    resetBtn.addEventListener('click', () => {
+      msgInput.value = '';
+      emailInput.value = '';
+      form.classList.remove('hidden');
+      successCard.classList.add('hidden');
+      document.querySelector('.page-header').classList.remove('hidden');
+    });
+
+    emailInput.addEventListener('input', () => {
+      emailError.classList.add('hidden');
+      emailInput.classList.remove('error');
+    });
+  </script>
+</body>
+</html>

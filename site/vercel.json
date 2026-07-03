@@ -3,6 +3,7 @@
   "outputDirectory": ".",
   "framework": null,
   "rewrites": [
+    { "source": "/feedback", "destination": "/feedback.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

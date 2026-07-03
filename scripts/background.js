@@ -452,6 +452,7 @@ chrome.tabs.onRemoved.addListener(async tabId => {
 
 chrome.runtime.onInstalled.addListener(details => {
   clearState();
+  chrome.runtime.setUninstallURL('https://bingit.vercel.app/feedback?ref=uninstall');
   if (details.reason === 'install') {
     chrome.runtime.openOptionsPage();
   }
