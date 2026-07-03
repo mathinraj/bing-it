@@ -213,8 +213,15 @@
 
     document.body.appendChild(el);
 
-    document.getElementById('bas-close').addEventListener('click', () => {
+    document.getElementById('bas-close').addEventListener('click', async () => {
       el.style.display = 'none';
+      if (overlayPoll) { clearInterval(overlayPoll); overlayPoll = null; }
+      try {
+        const s = await chrome.runtime.sendMessage({ action: 'getState' });
+        if (s && !s.isRunning) {
+          chrome.runtime.sendMessage({ action: 'clearState' }).catch(() => {});
+        }
+      } catch { /* extension context gone */ }
     });
 
     return el;
@@ -268,22 +275,21 @@
   async function initOverlay() {
     try {
       const state = await chrome.runtime.sendMessage({ action: 'getState' });
-      if (state && (state.isRunning || state.status === 'complete')) {
-        renderOverlay(state);
-        if (!overlayPoll) {
-          overlayPoll = setInterval(async () => {
-            try {
-              const s = await chrome.runtime.sendMessage({ action: 'getState' });
-              if (s && (s.isRunning || s.status === 'complete')) {
-                renderOverlay(s);
-              } else {
-                removeOverlay();
-                clearInterval(overlayPoll);
-                overlayPoll = null;
-              }
-            } catch { /* extension context gone */ }
-          }, 1000);
-        }
+      if (!state || (!state.isRunning && state.status !== 'complete')) return;
+      renderOverlay(state);
+      if (!overlayPoll) {
+        overlayPoll = setInterval(async () => {
+          try {
+            const s = await chrome.runtime.sendMessage({ action: 'getState' });
+            if (s && (s.isRunning || s.status === 'complete')) {
+              renderOverlay(s);
+            } else {
+              removeOverlay();
+              clearInterval(overlayPoll);
+              overlayPoll = null;
+            }
+          } catch { /* extension context gone */ }
+        }, 1000);
       }
     } catch { /* extension not ready */ }
   }
