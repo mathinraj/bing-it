@@ -1,5 +1,6 @@
 const SETTINGS_KEY = 'basSettings';
 const DEFAULTS = {
+  defaultSearchCount: 30,
   delayMinSec: 36,
   delayMaxSec: 108,
   delayFixed: false,
@@ -14,6 +15,7 @@ const DEFAULTS = {
 };
 
 const el = {
+  defaultCount:  document.getElementById('defaultCount'),
   delayFixed:    document.getElementById('delayFixed'),
   delayMin:      document.getElementById('delayMin'),
   delayMax:      document.getElementById('delayMax'),
@@ -36,6 +38,7 @@ const el = {
 // ── Load saved settings ──
 chrome.storage.local.get(SETTINGS_KEY, d => {
   const s = Object.assign({}, DEFAULTS, d[SETTINGS_KEY]);
+  el.defaultCount.value    = s.defaultSearchCount;
   el.delayFixed.checked    = s.delayFixed;
   el.delayMin.value        = s.delayMinSec;
   el.delayMax.value        = s.delayMaxSec;
@@ -78,6 +81,7 @@ function syncBehaviorUI() {
 let toastTimer;
 function save() {
   const s = {
+    defaultSearchCount:  Math.max(1, Math.min(500, +el.defaultCount.value || DEFAULTS.defaultSearchCount)),
     delayFixed:          el.delayFixed.checked,
     delayMinSec:         Math.max(10, +el.delayMin.value || DEFAULTS.delayMinSec),
     delayMaxSec:         Math.max(10, +el.delayMax.value || DEFAULTS.delayMaxSec),

@@ -16,6 +16,13 @@ const elTrends   = $('#trendsText');
 const elElapsed  = $('#elapsed');
 const elSummary  = $('#doneSummary');
 
+// ── Load default count from settings ──
+chrome.storage.local.get('basSettings', d => {
+  const count = (d.basSettings && d.basSettings.defaultSearchCount) || 30;
+  elSlider.value = Math.min(count, parseInt(elSlider.max, 10));
+  elCountVal.value = count;
+});
+
 // ── Slider ↔ Input sync ──
 elSlider.addEventListener('input', () => {
   elCountVal.value = elSlider.value;

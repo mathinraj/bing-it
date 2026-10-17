@@ -4,6 +4,7 @@ const STATE_KEY     = 'searchState';
 const SETTINGS_KEY  = 'basSettings';
 
 const DEFAULT_SETTINGS = {
+  defaultSearchCount: 30,
   delayMinSec: 36,
   delayMaxSec: 108,
   delayFixed: false,

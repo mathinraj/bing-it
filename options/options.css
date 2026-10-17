@@ -48,6 +48,9 @@ h1 { font-size: 22px; font-weight: 800; color: var(--text); }
   margin-bottom: 16px;
 }
 .card h2 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 14px;
   font-weight: 700;
   margin-bottom: 2px;
@@ -57,6 +60,66 @@ h1 { font-size: 22px; font-weight: 800; color: var(--text); }
   font-size: 12px;
   color: var(--text-dim);
   margin-bottom: 16px;
+}
+
+/* ── Info icon & tooltip ──────── */
+.info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  font-weight: 700;
+  font-style: italic;
+  font-family: Georgia, 'Times New Roman', serif;
+  color: var(--text-dim);
+  border: 1.5px solid var(--border);
+  border-radius: 50%;
+  cursor: help;
+  position: relative;
+  flex-shrink: 0;
+  transition: border-color .2s, color .2s;
+  line-height: 1;
+}
+.info-icon:hover,
+.info-icon:focus {
+  border-color: var(--accent);
+  color: var(--accent);
+  outline: none;
+}
+.info-icon:hover::after,
+.info-icon:focus::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 240px;
+  padding: 10px 12px;
+  background: var(--text);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 400;
+  font-style: normal;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  line-height: 1.5;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.15);
+  z-index: 100;
+  pointer-events: none;
+  white-space: normal;
+}
+.info-icon:hover::before,
+.info-icon:focus::before {
+  content: '';
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-bottom-color: var(--text);
+  z-index: 101;
 }
 
 /* ── Fields ───────────────────── */

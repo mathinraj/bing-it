@@ -19,9 +19,28 @@
       <p class="subtitle">bing it v1.3</p>
     </header>
 
+    <!-- Default Search Count -->
+    <section class="card">
+      <h2>
+        Default Search Count
+        <span class="info-icon" tabindex="0" data-tooltip="How many searches the extension will perform by default when you click 'Bing it!' in the popup. You can still override this before each session.">i</span>
+      </h2>
+      <p class="card-hint">Number of searches to run per session.</p>
+      <div class="field-row">
+        <label>Count</label>
+        <div class="input-group">
+          <input type="number" id="defaultCount" min="1" max="500" value="30">
+          <span class="unit">searches</span>
+        </div>
+      </div>
+    </section>
+
     <!-- Delay -->
     <section class="card">
-      <h2>Delay Between Searches</h2>
+      <h2>
+        Delay Between Searches
+        <span class="info-icon" tabindex="0" data-tooltip="Controls the pause between each search. A random delay within the min–max range makes your searches look more natural. Enable 'Fixed delay' to use one constant wait time instead.">i</span>
+      </h2>
       <p class="card-hint">Wait time after each search completes.</p>
       <div class="field-row toggle-row">
         <label for="delayFixed">Fixed delay (no randomization)</label>
@@ -48,7 +67,10 @@
 
     <!-- Coffee break -->
     <section class="card">
-      <h2>Coffee Break</h2>
+      <h2>
+        Coffee Break
+        <span class="info-icon" tabindex="0" data-tooltip="Inserts a longer pause after every N searches to mimic a real person taking a break. For example, every 5 searches the extension will wait 3–6 minutes before continuing. This makes the activity look more human-like.">i</span>
+      </h2>
       <p class="card-hint">Longer pause every N searches to look natural.</p>
       <div class="field-row toggle-row">
         <label for="coffeeEnabled">Enable coffee break</label>
@@ -91,7 +113,10 @@
 
     <!-- Behavior -->
     <section class="card">
-      <h2>Behavior</h2>
+      <h2>
+        Behavior
+        <span class="info-icon" tabindex="0" data-tooltip="Fine-tune how the extension behaves. 'Google Trends' uses real trending topics as search queries. 'Scroll results' simulates reading the page. 'Include delay in reading time' overlaps the wait timer with scrolling so sessions finish faster.">i</span>
+      </h2>
       <div class="field-row toggle-row">
         <div>
           <label for="useTrends">Use Google Trends queries</label>
