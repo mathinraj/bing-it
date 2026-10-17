@@ -94,6 +94,79 @@ header {
   box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 }
 
+/* ── Pin-to-toolbar banner ──────────── */
+.pin-banner {
+  margin: 0 20px;
+  padding: 12px 14px;
+  background: rgba(12, 131, 31, 0.05);
+  border: 1px solid rgba(12, 131, 31, 0.15);
+  border-radius: 10px;
+  margin-top: 12px;
+}
+.pin-banner-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.pin-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.pin-banner-left svg { flex-shrink: 0; }
+.pin-dismiss {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--text-dim);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 2px;
+}
+.pin-dismiss:hover { color: var(--text); }
+.pin-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pin-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.pin-step strong { color: var(--text); }
+.pin-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.pin-done {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.pin-banner.fade-out {
+  opacity: 0;
+  transition: opacity .4s;
+}
+
 /* ── Content area ──────────────────── */
 .content { padding: 20px; }
 

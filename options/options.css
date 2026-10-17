@@ -238,6 +238,43 @@ h1 { font-size: 22px; font-weight: 800; color: var(--text); }
   pointer-events: none;
 }
 
+/* ── Pin-to-toolbar banner ────── */
+.pin-banner-opt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  background: rgba(12, 131, 31, 0.05);
+  border: 1px solid rgba(12, 131, 31, 0.15);
+  border-radius: 10px;
+  animation: rateFadeIn .3s ease;
+}
+.pin-banner-opt.hidden { display: none; }
+.pin-banner-opt-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.pin-banner-opt-left svg {
+  flex-shrink: 0;
+  color: var(--accent);
+}
+.pin-banner-opt-left strong { color: var(--text); }
+.pin-banner-opt-dismiss {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--text-dim);
+  cursor: pointer;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.pin-banner-opt-dismiss:hover { color: var(--text); }
+
 /* ── Update banner ────────────── */
 .update-banner {
   display: flex;

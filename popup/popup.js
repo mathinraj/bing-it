@@ -259,3 +259,53 @@ async function loadBanner() {
   promoBanner.classList.remove('hidden');
 }
 loadBanner();
+
+// ── Pin-to-toolbar ──
+const pinBanner  = document.getElementById('pin-banner');
+const pinDismiss = document.getElementById('pin-dismiss');
+const pinSteps   = document.getElementById('pin-steps');
+const pinDone    = document.getElementById('pin-done');
+
+chrome.runtime.sendMessage({ action: 'checkPinToToolbar' }, (res) => {
+  if (chrome.runtime.lastError || !res) return;
+
+  if (res.isPinned) {
+    pinBanner.classList.remove('hidden');
+    pinSteps.classList.add('hidden');
+    pinDone.classList.remove('hidden');
+    setTimeout(() => {
+      pinBanner.classList.add('fade-out');
+      setTimeout(() => pinBanner.classList.add('hidden'), 400);
+    }, 2500);
+    return;
+  }
+
+  if (res.show) {
+    pinBanner.classList.remove('hidden');
+    startPinCheck();
+  }
+});
+
+pinDismiss.addEventListener('click', () => {
+  chrome.runtime.sendMessage({ action: 'dismissPinToToolbar' });
+  pinBanner.classList.add('fade-out');
+  setTimeout(() => pinBanner.classList.add('hidden'), 400);
+});
+
+function startPinCheck() {
+  const interval = setInterval(() => {
+    chrome.runtime.sendMessage({ action: 'checkPinToToolbar' }, (res) => {
+      if (chrome.runtime.lastError || !res) return;
+      if (res.isPinned) {
+        clearInterval(interval);
+        pinSteps.classList.add('hidden');
+        pinDone.classList.remove('hidden');
+        setTimeout(() => {
+          pinBanner.classList.add('fade-out');
+          setTimeout(() => pinBanner.classList.add('hidden'), 400);
+        }, 2500);
+      }
+    });
+  }, 2000);
+  setTimeout(() => clearInterval(interval), 5 * 60 * 1000);
+}

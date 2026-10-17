@@ -479,6 +479,27 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     case 'clearState':
       clearState().then(() => sendResponse({ ok: true }));
       return true;
+    case 'checkPinToToolbar': {
+      (async () => {
+        const { showPinToToolbar } = await chrome.storage.local.get('showPinToToolbar');
+        let isPinned = false;
+        try {
+          const settings = await chrome.action.getUserSettings();
+          isPinned = settings.isOnToolbar === true;
+        } catch (_) {}
+        if (isPinned) {
+          await chrome.storage.local.set({ showPinToToolbar: false });
+          try { chrome.action.setBadgeText({ text: '' }); } catch (_) {}
+        }
+        sendResponse({ show: showPinToToolbar === true && !isPinned, isPinned });
+      })();
+      return true;
+    }
+    case 'dismissPinToToolbar':
+      chrome.storage.local.set({ showPinToToolbar: false });
+      try { chrome.action.setBadgeText({ text: '' }); } catch (_) {}
+      sendResponse({ ok: true });
+      return false;
   }
 });
 
@@ -492,6 +513,11 @@ chrome.runtime.onInstalled.addListener(async details => {
   chrome.runtime.setUninstallURL('https://bingit.vercel.app/feedback?ref=uninstall');
   if (details.reason === 'install') {
     chrome.runtime.openOptionsPage();
+    await chrome.storage.local.set({ showPinToToolbar: true });
+    try {
+      chrome.action.setBadgeText({ text: 'PIN' });
+      chrome.action.setBadgeBackgroundColor({ color: '#0c831f' });
+    } catch (_) {}
   }
   if (details.reason === 'update') {
     await chrome.storage.local.set({

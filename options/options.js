@@ -185,7 +185,23 @@ document.getElementById('btn-whats-new').addEventListener('click', () => {
   chrome.storage.local.set({ showWhatsNew: false });
 });
 
+// ── Pin-to-toolbar (options) ──
+function loadPinBanner() {
+  chrome.runtime.sendMessage({ action: 'checkPinToToolbar' }, (res) => {
+    if (chrome.runtime.lastError || !res) return;
+    if (!res.isPinned) {
+      document.getElementById('opt-pin-banner').classList.remove('hidden');
+    }
+  });
+}
+
+document.getElementById('opt-pin-dismiss').addEventListener('click', () => {
+  chrome.runtime.sendMessage({ action: 'dismissPinToToolbar' });
+  document.getElementById('opt-pin-banner').classList.add('hidden');
+});
+
 loadWhatsNew();
+loadPinBanner();
 loadUpdateBanner().then(hasUpdate => {
   if (!hasUpdate) loadRateBanner();
 });
