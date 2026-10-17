@@ -188,7 +188,21 @@ async function fetchTrends() {
   return [];
 }
 
-async function loadFallback() {
+async function fetchRemoteQueries() {
+  const geo = detectCountryCode();
+  const url = geo === 'IN'
+    ? 'https://raw.githubusercontent.com/mathinraj/mathinraj/refs/heads/main/promotions/trends.json'
+    : 'https://raw.githubusercontent.com/mathinraj/mathinraj/refs/heads/main/promotions/trends-global.json';
+  try {
+    const r = await fetch(url, { cache: 'no-cache' });
+    if (!r.ok) return [];
+    const data = await r.json();
+    if (Array.isArray(data) && data.length > 0) return data;
+  } catch { /* fall through to local */ }
+  return [];
+}
+
+async function loadLocalQueries() {
   const geo = detectCountryCode();
   const file = geo === 'IN' ? 'assets/queries.json' : 'assets/queries-global.json';
   try {
@@ -202,8 +216,12 @@ async function loadFallback() {
 async function buildQueries(count, settings) {
   const useTrends = settings ? settings.useTrends !== false : true;
   const trends = useTrends ? await fetchTrends() : [];
-  const fallback = await loadFallback();
   const hasTrends = trends.length > 0;
+
+  // Fallback chain: remote hosted JSON → local bundled JSON
+  let fallback = await fetchRemoteQueries();
+  if (!fallback.length) fallback = await loadLocalQueries();
+
   const pool = hasTrends
     ? [...shuffle(trends), ...shuffle(fallback)]
     : shuffle(fallback);
