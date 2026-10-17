@@ -1,3 +1,22 @@
+// ── Store URLs ──
+const REVIEW_URLS = {
+  chrome:  'https://chromewebstore.google.com/detail/Bing%20it%20%E2%80%94%20Smart%20Auto%20Searcher/gldhjncdmgpileambimhpjmeoejgclen',
+  firefox: 'https://addons.mozilla.org/en-US/firefox/addon/bing-it/reviews/'
+};
+
+const STORE_URLS = {
+  chrome:  'https://chromewebstore.google.com/detail/Bing%20it%20%E2%80%94%20Smart%20Auto%20Searcher/gldhjncdmgpileambimhpjmeoejgclen',
+  firefox: 'https://addons.mozilla.org/en-US/firefox/addon/bing-it/'
+};
+
+function getReviewUrl() {
+  return REVIEW_URLS[BINGIT_STORE] || 'https://bingit.vercel.app';
+}
+
+function getStoreUrl() {
+  return STORE_URLS[BINGIT_STORE] || 'https://bingit.vercel.app';
+}
+
 const SETTINGS_KEY = 'basSettings';
 const DEFAULTS = {
   defaultSearchCount: 30,
@@ -112,3 +131,30 @@ document.querySelectorAll('input').forEach(inp => {
     save();
   });
 });
+
+// ── Rate banner ──
+async function loadRateBanner() {
+  const data = await chrome.storage.local.get(['rated', 'remindRateAfter']);
+
+  if (data.rated) return;
+  if (data.remindRateAfter && Date.now() < data.remindRateAfter) return;
+
+  const banner   = document.getElementById('rate-banner');
+  const btnRate  = document.getElementById('opt-rate-now');
+  const btnLater = document.getElementById('opt-rate-later');
+
+  banner.classList.remove('hidden');
+  btnRate.href = getReviewUrl();
+
+  btnRate.addEventListener('click', async () => {
+    await chrome.storage.local.set({ rated: true });
+    banner.classList.add('hidden');
+  });
+
+  btnLater.addEventListener('click', async () => {
+    const remindAt = Date.now() + (2 * 24 * 60 * 60 * 1000);
+    await chrome.storage.local.set({ remindRateAfter: remindAt });
+    banner.classList.add('hidden');
+  });
+}
+loadRateBanner();

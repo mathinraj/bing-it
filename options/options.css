@@ -238,6 +238,64 @@ h1 { font-size: 22px; font-weight: 800; color: var(--text); }
   pointer-events: none;
 }
 
+/* ── Rate banner ──────────────── */
+.rate-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  background: rgba(255, 229, 0, 0.08);
+  border: 1px solid rgba(255, 229, 0, 0.25);
+  border-radius: 10px;
+  animation: rateFadeIn .3s ease;
+}
+@keyframes rateFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.rate-banner.hidden {
+  display: none;
+}
+.rate-banner-text {
+  font-size: 12px;
+  color: var(--text);
+  font-weight: 500;
+}
+.rate-banner-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.rate-banner-btn {
+  padding: 5px 12px;
+  border: none;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all .15s;
+}
+.rate-banner-btn--primary {
+  background: var(--brand, #ffe500);
+  color: var(--text);
+}
+.rate-banner-btn--primary:hover {
+  box-shadow: 0 2px 8px rgba(255, 229, 0, 0.35);
+}
+.rate-banner-btn--dismiss {
+  background: var(--bg-input);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+.rate-banner-btn--dismiss:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
 /* ── Utility ──────────────────── */
 .hidden { opacity: 0; pointer-events: none; }
 

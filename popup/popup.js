@@ -1,5 +1,33 @@
 const $ = s => document.querySelector(s);
 
+// ── Store URLs ──
+const REMIND_DAYS = 2;
+
+const REVIEW_URLS = {
+  chrome:  'https://chromewebstore.google.com/detail/Bing%20it%20%E2%80%94%20Smart%20Auto%20Searcher/gldhjncdmgpileambimhpjmeoejgclen',
+  firefox: 'https://addons.mozilla.org/en-US/firefox/addon/bing-it/reviews/'
+};
+
+const STORE_URLS = {
+  chrome:  'https://chromewebstore.google.com/detail/Bing%20it%20%E2%80%94%20Smart%20Auto%20Searcher/gldhjncdmgpileambimhpjmeoejgclen',
+  firefox: 'https://addons.mozilla.org/en-US/firefox/addon/bing-it/'
+};
+
+function getReviewUrl() {
+  return REVIEW_URLS[BINGIT_STORE] || 'https://bingit.vercel.app';
+}
+
+function getStoreUrl() {
+  return STORE_URLS[BINGIT_STORE] || 'https://bingit.vercel.app';
+}
+
+async function shouldShowRate() {
+  const data = await chrome.storage.local.get(['rated', 'remindRateAfter']);
+  if (data.rated) return false;
+  if (data.remindRateAfter && Date.now() < data.remindRateAfter) return false;
+  return true;
+}
+
 const elSetup    = $('#setup');
 const elProgress = $('#progress');
 const elDone     = $('#done');
@@ -139,3 +167,23 @@ setInterval(poll, 1000);
 chrome.storage.onChanged.addListener(changes => {
   if (changes.searchState) render(changes.searchState.newValue);
 });
+
+// ── Rate prompt ──
+document.getElementById('btn-rate-now').addEventListener('click', async () => {
+  await chrome.storage.local.set({ rated: true });
+  chrome.tabs.create({ url: getReviewUrl() });
+  window.close();
+});
+
+document.getElementById('btn-rate-later').addEventListener('click', async () => {
+  const remindAt = Date.now() + (REMIND_DAYS * 24 * 60 * 60 * 1000);
+  await chrome.storage.local.set({ remindRateAfter: remindAt });
+  document.getElementById('rate-prompt').classList.add('hidden');
+});
+
+async function loadRatePrompt() {
+  if (await shouldShowRate()) {
+    document.getElementById('rate-prompt').classList.remove('hidden');
+  }
+}
+loadRatePrompt();

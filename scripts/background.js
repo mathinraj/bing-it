@@ -302,6 +302,10 @@ async function executeSearch() {
     state.currentIndex++;
     state.searchesCompleted = state.currentIndex;
 
+    // Track total searches for rating prompt
+    const { actionCount } = await chrome.storage.local.get('actionCount');
+    await chrome.storage.local.set({ actionCount: (actionCount || 0) + 1 });
+
     if (state.currentIndex >= state.totalSearches) {
       await setState(state);
       await finishSession();

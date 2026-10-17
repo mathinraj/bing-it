@@ -259,5 +259,49 @@ footer a {
 }
 footer a:hover { text-decoration: underline; }
 
+/* ── Rate prompt ────────────────────── */
+.rate-prompt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  margin: 0 20px 4px;
+  background: rgba(255, 229, 0, 0.08);
+  border: 1px solid rgba(255, 229, 0, 0.25);
+  border-radius: 10px;
+}
+.rate-left { display: flex; align-items: center; gap: 7px; }
+.rate-star { font-size: 15px; line-height: 1; }
+.rate-text { font-size: 12px; font-weight: 600; color: var(--text); }
+.rate-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.rate-btn {
+  padding: 4px 10px;
+  border: none;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+}
+.rate-btn--primary {
+  background: var(--brand);
+  color: var(--text);
+}
+.rate-btn--primary:hover {
+  background: var(--brand-dark);
+  box-shadow: 0 2px 8px rgba(255, 229, 0, 0.35);
+}
+.rate-btn--later {
+  background: var(--bg-input);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+.rate-btn--later:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
 /* ── Utility ────────────────────────── */
 .hidden { display: none !important; }
