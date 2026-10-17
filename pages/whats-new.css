@@ -103,6 +103,9 @@ body {
 .feature-icon--rate     { background: linear-gradient(135deg, #f59e0b, #eab308); }
 .feature-icon--update   { background: linear-gradient(135deg, #3b82f6, #6366f1); }
 .feature-icon--count    { background: linear-gradient(135deg, #8b5cf6, #a855f7); }
+.feature-icon--pin      { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+.feature-icon--request  { background: linear-gradient(135deg, #10b981, #059669); }
+.feature-icon--remote   { background: linear-gradient(135deg, #06b6d4, #3b82f6); }
 
 .feature-body { flex: 1; min-width: 0; }
 .feature-body h3 {
