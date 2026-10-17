@@ -19,7 +19,22 @@
       <p class="subtitle">bing it v1.4</p>
     </header>
 
-    <!-- Rate banner (shows after 20+ searches and not yet rated) -->
+    <!-- Update banner -->
+    <div class="update-banner hidden" id="update-banner">
+      <div class="update-left">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="17 1 21 5 17 9"/>
+          <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+          <polyline points="7 23 3 19 7 15"/>
+          <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+        </svg>
+        <span>v<span id="opt-update-version"></span> is available!</span>
+      </div>
+      <a class="update-btn" id="opt-update-btn" href="#" target="_blank" rel="noopener">Update now</a>
+    </div>
+
+    <!-- Rate banner (not yet rated) -->
     <div class="rate-banner hidden" id="rate-banner">
       <span class="rate-banner-text">&#11088; Enjoying bing it? Help others discover it!</span>
       <div class="rate-banner-actions">

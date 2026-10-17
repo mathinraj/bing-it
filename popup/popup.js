@@ -28,6 +28,20 @@ async function shouldShowRate() {
   return true;
 }
 
+// ── Update banner ──
+async function showUpdateBanner() {
+  const { updateAvailable, latestVersion } = await chrome.storage.local.get(['updateAvailable', 'latestVersion']);
+  if (!updateAvailable || !latestVersion) return;
+  document.getElementById('update-version').textContent = latestVersion;
+  document.getElementById('update-banner').classList.remove('hidden');
+}
+showUpdateBanner();
+
+document.getElementById('btn-update').addEventListener('click', () => {
+  chrome.tabs.create({ url: getStoreUrl() });
+  window.close();
+});
+
 const elSetup    = $('#setup');
 const elProgress = $('#progress');
 const elDone     = $('#done');

@@ -132,6 +132,20 @@ document.querySelectorAll('input').forEach(inp => {
   });
 });
 
+// ── Update banner ──
+async function loadUpdateBanner() {
+  const { updateAvailable, latestVersion } = await chrome.storage.local.get(['updateAvailable', 'latestVersion']);
+  if (!updateAvailable || !latestVersion) return false;
+
+  const banner = document.getElementById('update-banner');
+  const btnUpdate = document.getElementById('opt-update-btn');
+
+  document.getElementById('opt-update-version').textContent = latestVersion;
+  btnUpdate.href = getStoreUrl();
+  banner.classList.remove('hidden');
+  return true;
+}
+
 // ── Rate banner ──
 async function loadRateBanner() {
   const data = await chrome.storage.local.get(['rated', 'remindRateAfter']);
@@ -157,4 +171,6 @@ async function loadRateBanner() {
     banner.classList.add('hidden');
   });
 }
-loadRateBanner();
+loadUpdateBanner().then(hasUpdate => {
+  if (!hasUpdate) loadRateBanner();
+});

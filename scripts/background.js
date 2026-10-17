@@ -77,6 +77,38 @@ function stopWatchdog() {
   chrome.alarms.clear(WATCHDOG_NAME);
 }
 
+// ─── Update Check ────────────────────────────────────────────
+
+const VERSIONS_URL = 'https://raw.githubusercontent.com/mathinraj/mathinraj/main/promotions/versions.json';
+
+async function checkForUpdate() {
+  try {
+    const res = await fetch(VERSIONS_URL, { cache: 'no-cache' });
+    const versions = await res.json();
+    const latest = versions['bingit'];
+    if (!latest) return;
+
+    const current = chrome.runtime.getManifest().version;
+    if (isNewerVersion(latest, current)) {
+      await chrome.storage.local.set({ updateAvailable: true, latestVersion: latest });
+    } else {
+      await chrome.storage.local.remove(['updateAvailable', 'latestVersion']);
+    }
+  } catch (_) {}
+}
+
+function isNewerVersion(remote, local) {
+  const r = remote.split('.').map(Number);
+  const l = local.split('.').map(Number);
+  for (let i = 0; i < Math.max(r.length, l.length); i++) {
+    const rv = r[i] || 0;
+    const lv = l[i] || 0;
+    if (rv > lv) return true;
+    if (rv < lv) return false;
+  }
+  return false;
+}
+
 // ─── Settings ────────────────────────────────────────────────
 
 async function loadSettings() {
@@ -461,10 +493,12 @@ chrome.runtime.onInstalled.addListener(details => {
   if (details.reason === 'install') {
     chrome.runtime.openOptionsPage();
   }
+  checkForUpdate();
 });
 
 // Resume watchdog if browser restarts with an active session
 chrome.runtime.onStartup.addListener(async () => {
+  checkForUpdate();
   const state = await getState();
   if (state && state.isRunning) {
     startWatchdog();
