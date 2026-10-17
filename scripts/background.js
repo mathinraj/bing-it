@@ -487,11 +487,18 @@ chrome.tabs.onRemoved.addListener(async tabId => {
   if (s?.isRunning && s.tabId === tabId) await stopSession();
 });
 
-chrome.runtime.onInstalled.addListener(details => {
+chrome.runtime.onInstalled.addListener(async details => {
   clearState();
   chrome.runtime.setUninstallURL('https://bingit.vercel.app/feedback?ref=uninstall');
   if (details.reason === 'install') {
     chrome.runtime.openOptionsPage();
+  }
+  if (details.reason === 'update') {
+    await chrome.storage.local.set({
+      showWhatsNew: true,
+      updatedFrom: details.previousVersion,
+      updatedTo: chrome.runtime.getManifest().version
+    });
   }
   checkForUpdate();
 });

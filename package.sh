@@ -24,6 +24,7 @@ zip -r "$CHROME_ZIP" \
   scripts/ \
   popup/ \
   options/ \
+  pages/ \
   assets/ \
   -x "*.DS_Store" \
   -x "assets/icon.svg" \

@@ -361,3 +361,28 @@ h1 { font-size: 22px; font-weight: 800; color: var(--text); }
 }
 .options-footer a:hover { color: var(--accent); }
 .footer-dot { color: var(--text-dim); }
+
+/* ── What's New button ────────── */
+.whats-new-btn {
+  position: relative;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: color .2s;
+  padding: 0;
+}
+.whats-new-btn:hover { color: var(--accent); }
+.whats-new-dot {
+  position: absolute;
+  top: -2px;
+  right: -8px;
+  width: 7px;
+  height: 7px;
+  background: #e23744;
+  border-radius: 50%;
+}
+.whats-new-dot.hidden { display: none; }

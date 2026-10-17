@@ -171,6 +171,21 @@ async function loadRateBanner() {
     banner.classList.add('hidden');
   });
 }
+// ── What's New ──
+async function loadWhatsNew() {
+  const { showWhatsNew } = await chrome.storage.local.get('showWhatsNew');
+  if (showWhatsNew) {
+    document.getElementById('whats-new-dot').classList.remove('hidden');
+  }
+}
+
+document.getElementById('btn-whats-new').addEventListener('click', () => {
+  chrome.tabs.create({ url: chrome.runtime.getURL('pages/whats-new.html') });
+  document.getElementById('whats-new-dot').classList.add('hidden');
+  chrome.storage.local.set({ showWhatsNew: false });
+});
+
+loadWhatsNew();
 loadUpdateBanner().then(hasUpdate => {
   if (!hasUpdate) loadRateBanner();
 });
