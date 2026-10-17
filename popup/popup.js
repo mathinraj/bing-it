@@ -268,19 +268,7 @@ const pinDone    = document.getElementById('pin-done');
 
 chrome.runtime.sendMessage({ action: 'checkPinToToolbar' }, (res) => {
   if (chrome.runtime.lastError || !res) return;
-
-  if (res.isPinned) {
-    pinBanner.classList.remove('hidden');
-    pinSteps.classList.add('hidden');
-    pinDone.classList.remove('hidden');
-    setTimeout(() => {
-      pinBanner.classList.add('fade-out');
-      setTimeout(() => pinBanner.classList.add('hidden'), 400);
-    }, 2500);
-    return;
-  }
-
-  if (res.show) {
+  if (res.show && !res.isPinned) {
     pinBanner.classList.remove('hidden');
     startPinCheck();
   }
