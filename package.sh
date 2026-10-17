@@ -1,24 +1,25 @@
 #!/bin/bash
+set -euo pipefail
 
-# Package "Bing it" extension for Chrome/Edge Web Store upload
-# Usage: ./package.sh
-# Output: bing-it-v{version}.zip
+REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
+cd "$REPO_ROOT"
 
-set -e
+VERSION=$(python3 -c "import json; print(json.load(open('manifest.json'))['version'])")
+CONFIG_FILE="scripts/config.js"
+EXT_NAME="bing-it"
 
-ROOT="$(cd "$(dirname "$0")" && pwd)"
-MANIFEST="$ROOT/manifest.json"
+rm -f "$REPO_ROOT"/${EXT_NAME}-for-*.zip
 
-VERSION=$(grep '"version"' "$MANIFEST" | head -1 | sed 's/.*"version".*"\([^"]*\)".*/\1/')
-FILENAME="bing-it-v${VERSION}.zip"
+echo "bing it v${VERSION} — Building store packages"
+echo "================================================"
 
-echo "📦 Packaging Bing it v${VERSION}..."
+# ── Chrome ─────────────────────────────────────────
+echo ""
+echo "[1/2] Chrome Web Store ..."
+echo "const BINGIT_STORE = 'chrome';" > "$CONFIG_FILE"
 
-rm -f "$ROOT/$FILENAME"
-
-cd "$ROOT"
-
-zip -r "$FILENAME" \
+CHROME_ZIP="$REPO_ROOT/${EXT_NAME}-for-chrome-${VERSION}.zip"
+zip -r "$CHROME_ZIP" \
   manifest.json \
   scripts/ \
   popup/ \
@@ -26,14 +27,35 @@ zip -r "$FILENAME" \
   assets/ \
   -x "*.DS_Store" \
   -x "assets/icon.svg" \
-  -x "response.xml"
+  -x "response.xml" > /dev/null
 
-SIZE=$(du -h "$FILENAME" | cut -f1)
+echo "  → $CHROME_ZIP ($(du -h "$CHROME_ZIP" | cut -f1))"
+
+# ── Firefox (uncomment when ready to publish) ──────
+# echo ""
+# echo "[2/2] Firefox Add-ons ..."
+# echo "const BINGIT_STORE = 'firefox';" > "$CONFIG_FILE"
+#
+# FIREFOX_ZIP="$REPO_ROOT/${EXT_NAME}-for-firefox-${VERSION}.zip"
+# zip -r "$FIREFOX_ZIP" \
+#   manifest.json \
+#   scripts/ \
+#   popup/ \
+#   options/ \
+#   assets/ \
+#   -x "*.DS_Store" \
+#   -x "assets/icon.svg" \
+#   -x "response.xml" > /dev/null
+#
+# echo "  → $FIREFOX_ZIP ($(du -h "$FIREFOX_ZIP" | cut -f1))"
+
+# Reset config back to Chrome default
+echo "const BINGIT_STORE = 'chrome';" > "$CONFIG_FILE"
 
 echo ""
-echo "✅ Done! Package ready at:"
-echo "   $FILENAME ($SIZE)"
+echo "================================================"
+echo "Done!"
+ls -lh "$REPO_ROOT"/${EXT_NAME}-for-*.zip
 echo ""
-echo "Upload this file to:"
-echo "   • Chrome Web Store: https://chrome.google.com/webstore/devconsole"
-echo "   • Edge Add-ons:     https://partner.microsoft.com/en-us/dashboard/microsoftedge"
+echo "Upload Chrome zip to:"
+echo "  https://chrome.google.com/webstore/devconsole"
