@@ -181,9 +181,67 @@ document.getElementById('btn-rate-later').addEventListener('click', async () => 
   document.getElementById('rate-prompt').classList.add('hidden');
 });
 
-async function loadRatePrompt() {
-  if (await shouldShowRate()) {
-    document.getElementById('rate-prompt').classList.remove('hidden');
+// ── Promo banner (rotating, interleaves rate prompt) ──
+const PROMO_URL  = 'https://raw.githubusercontent.com/mathinraj/mathinraj/main/promotions/promos.json';
+const SELF_ID    = 'bingit';
+const RATE_ITEM_ID = '__rate__';
+
+async function loadBanner() {
+  const promoBanner = document.getElementById('promo-banner');
+  const ratePrompt  = document.getElementById('rate-prompt');
+
+  let promos;
+  try {
+    const res = await fetch(PROMO_URL, { cache: 'no-cache' });
+    promos = await res.json();
+    await chrome.storage.local.set({ cachedPromos: promos });
+  } catch (_) {
+    const { cachedPromos } = await chrome.storage.local.get('cachedPromos');
+    promos = cachedPromos || [];
   }
+
+  promos = promos.filter(p => p.id !== SELF_ID);
+
+  const canRate = await shouldShowRate();
+  if (canRate) {
+    promos.push({ id: RATE_ITEM_ID });
+  }
+
+  if (!promos.length) {
+    promoBanner.classList.add('hidden');
+    if (canRate) ratePrompt.classList.remove('hidden');
+    return;
+  }
+
+  const { promoIndex } = await chrome.storage.local.get('promoIndex');
+  const idx = (typeof promoIndex === 'number') ? promoIndex % promos.length : 0;
+  const item = promos[idx];
+
+  await chrome.storage.local.set({ promoIndex: (idx + 1) % promos.length });
+
+  if (item.id === RATE_ITEM_ID) {
+    promoBanner.classList.add('hidden');
+    ratePrompt.classList.remove('hidden');
+    return;
+  }
+
+  ratePrompt.classList.add('hidden');
+
+  const iconEl = document.getElementById('promo-icon');
+  const logoEl = document.getElementById('promo-logo');
+
+  if (item.logo) {
+    logoEl.src = item.logo;
+    logoEl.classList.remove('hidden');
+    iconEl.childNodes.forEach(n => { if (n.nodeType === 3) n.textContent = ''; });
+  } else {
+    logoEl.classList.add('hidden');
+    iconEl.childNodes[0].textContent = item.icon || '';
+  }
+
+  document.getElementById('promo-name').textContent = item.name;
+  document.getElementById('promo-desc').textContent = item.desc;
+  promoBanner.href = item.url;
+  promoBanner.classList.remove('hidden');
 }
-loadRatePrompt();
+loadBanner();

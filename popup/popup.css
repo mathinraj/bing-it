@@ -303,5 +303,70 @@ footer a:hover { text-decoration: underline; }
   color: var(--text);
 }
 
+/* ── Promo banner ───────────────────── */
+.promo-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  margin: 0 20px 4px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all .2s;
+}
+.promo-banner:hover {
+  background: var(--bg-input);
+  border-color: var(--accent);
+}
+.promo-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 8px;
+  background: rgba(12, 131, 31, 0.08);
+  font-size: 16px;
+  line-height: 1;
+}
+.promo-logo {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  object-fit: contain;
+}
+.promo-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+.promo-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+.promo-desc {
+  font-size: 10px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.promo-cta {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.promo-banner:hover .promo-cta {
+  color: var(--accent-hover);
+}
+
 /* ── Utility ────────────────────────── */
 .hidden { display: none !important; }

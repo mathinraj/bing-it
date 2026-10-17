@@ -78,7 +78,7 @@
       </section>
     </div>
 
-    <!-- Rate prompt (shown after 20+ searches, not yet rated) -->
+    <!-- Rate prompt (interleaved with promo rotation) -->
     <div class="rate-prompt hidden" id="rate-prompt">
       <div class="rate-left">
         <span class="rate-star">&#11088;</span>
@@ -89,6 +89,18 @@
         <button class="rate-btn rate-btn--later" id="btn-rate-later">Remind me</button>
       </div>
     </div>
+
+    <!-- Promo banner (rotating) -->
+    <a class="promo-banner hidden" id="promo-banner" href="#" target="_blank" rel="noopener">
+      <span class="promo-icon" id="promo-icon">
+        <img class="promo-logo hidden" id="promo-logo" width="20" height="20" alt="">
+      </span>
+      <span class="promo-body">
+        <span class="promo-name" id="promo-name"></span>
+        <span class="promo-desc" id="promo-desc"></span>
+      </span>
+      <span class="promo-cta">Try it &rarr;</span>
+    </a>
 
     <footer>
       <a href="https://bingit.vercel.app" target="_blank">Website</a>
