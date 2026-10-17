@@ -171,6 +171,93 @@ async function loadRateBanner() {
     banner.classList.add('hidden');
   });
 }
+// ── Feature Request (EmailJS) ──
+const EMAILJS_SERVICE_ID  = 'service_em2o2a6';
+const EMAILJS_TEMPLATE_ID = 'template_6595ut4';
+const EMAILJS_PUBLIC_KEY  = 'R2Yro3gG1FbXS9fJm';
+
+const frToggle  = document.getElementById('fr-toggle');
+const frBody    = document.getElementById('fr-body');
+const frChevron = document.getElementById('fr-chevron');
+const frEmail   = document.getElementById('fr-email');
+const frCategory = document.getElementById('fr-category');
+const frMessage = document.getElementById('fr-message');
+const btnSendFR = document.getElementById('btn-send-fr');
+const frMsg     = document.getElementById('fr-msg');
+
+frToggle.addEventListener('click', () => {
+  const isOpen = frBody.classList.toggle('expanded');
+  frChevron.classList.toggle('open', isOpen);
+});
+
+btnSendFR.addEventListener('click', async () => {
+  const message = frMessage.value.trim();
+
+  if (message.length < 10) {
+    frMsg.textContent = 'Please enter at least 10 characters.';
+    frMsg.className = 'fr-msg error';
+    return;
+  }
+
+  btnSendFR.disabled = true;
+  btnSendFR.textContent = 'Sending…';
+
+  try {
+    const res = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        service_id:  EMAILJS_SERVICE_ID,
+        template_id: EMAILJS_TEMPLATE_ID,
+        user_id:     EMAILJS_PUBLIC_KEY,
+        template_params: {
+          from_email: frEmail.value.trim() || 'Not provided',
+          category:   '[bing it] ' + frCategory.value,
+          message:    '[bing it] ' + message,
+          timestamp:  new Date().toISOString(),
+          version:    chrome.runtime.getManifest().version
+        }
+      })
+    });
+
+    if (res.ok) {
+      frMsg.textContent = 'Thank you! Your request has been sent.';
+      frMsg.className = 'fr-msg success';
+      frEmail.value = '';
+      frMessage.value = '';
+      frCategory.value = 'feature';
+    } else {
+      throw new Error();
+    }
+  } catch (_) {
+    frMsg.textContent = 'Failed to send. Please try again later.';
+    frMsg.className = 'fr-msg error';
+  }
+
+  btnSendFR.disabled = false;
+  btnSendFR.innerHTML = `
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="22" y1="2" x2="11" y2="13"/>
+      <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+    </svg>
+    Send`;
+});
+
+// ── Support Strip (rate button) ──
+(async function loadSupportStrip() {
+  const rateStrip = document.getElementById('btn-rate-strip');
+  const { rated } = await chrome.storage.local.get('rated');
+  if (rated && rateStrip) {
+    rateStrip.classList.add('hidden');
+  } else if (rateStrip) {
+    rateStrip.href = getReviewUrl();
+    rateStrip.addEventListener('click', async () => {
+      await chrome.storage.local.set({ rated: true });
+    });
+  }
+})();
+
 // ── What's New ──
 async function loadWhatsNew() {
   const { showWhatsNew } = await chrome.storage.local.get('showWhatsNew');

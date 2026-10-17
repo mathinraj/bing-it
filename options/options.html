@@ -186,6 +186,82 @@
       </div>
     </section>
 
+    <!-- Feature Request -->
+    <section class="card">
+      <div class="fr-toggle" id="fr-toggle">
+        <h2>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+          Feature Request / Bug Report
+        </h2>
+        <svg class="fr-chevron" id="fr-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+      <div class="fr-body" id="fr-body">
+        <div class="fr-field">
+          <label class="fr-label" for="fr-email">Email (optional)</label>
+          <input type="email" id="fr-email" class="fr-input" placeholder="you@example.com">
+        </div>
+        <div class="fr-field">
+          <label class="fr-label" for="fr-category">Category</label>
+          <select id="fr-category" class="fr-select">
+            <option value="feature">Feature Request</option>
+            <option value="bug">Bug Report</option>
+            <option value="improvement">Improvement</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="fr-field">
+          <label class="fr-label" for="fr-message">Your message</label>
+          <textarea id="fr-message" class="fr-input fr-textarea" rows="3" placeholder="Describe your idea or issue..."></textarea>
+        </div>
+        <div class="fr-msg" id="fr-msg"></div>
+        <button class="fr-send" id="btn-send-fr">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+          Send
+        </button>
+      </div>
+    </section>
+
+    <!-- Support Strip -->
+    <div class="support-strip">
+      <div class="support-strip-text">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"
+                fill="rgba(239,68,68,0.15)" stroke="#ef4444"/>
+        </svg>
+        <span>Enjoying bing it? Your support keeps it free &amp; growing.</span>
+      </div>
+      <div class="support-strip-actions">
+        <a href="https://coindrop.to/mathinraj" target="_blank" rel="noopener" class="strip-btn strip-btn--coffee">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+            <line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
+          </svg>
+          Buy me a coffee
+        </a>
+        <a href="#" target="_blank" rel="noopener" id="btn-rate-strip" class="strip-btn strip-btn--rate">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+          Rate bing it
+        </a>
+      </div>
+    </div>
+
     <div id="toast" class="toast hidden">Settings saved</div>
 
     <footer class="options-footer">
