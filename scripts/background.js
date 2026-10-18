@@ -531,7 +531,7 @@ chrome.runtime.onInstalled.addListener(async details => {
   chrome.runtime.setUninstallURL('https://bingit.vercel.app/feedback?ref=uninstall');
   if (details.reason === 'install') {
     chrome.runtime.openOptionsPage();
-    await chrome.storage.local.set({ showPinToToolbar: true });
+    await chrome.storage.local.set({ showPinToToolbar: true, showTour: true });
     try {
       chrome.action.setBadgeText({ text: 'PIN' });
       chrome.action.setBadgeBackgroundColor({ color: '#0c831f' });

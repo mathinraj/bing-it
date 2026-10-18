@@ -57,10 +57,10 @@
     </div>
 
     <!-- Default Search Count -->
-    <section class="card">
+    <section class="card" id="card-count">
       <h2>
         Default Search Count
-        <span class="info-icon" tabindex="0" data-tooltip="How many searches the extension will perform by default when you click 'Bing it!' in the popup. You can still override this before each session.">i</span>
+        <span class="info-icon" tabindex="0" data-tooltip="Sets the starting number in the popup slider. Example: set to 35, and the popup will default to 35 searches every time you open it. You can always change it before clicking 'Bing it!'">i</span>
       </h2>
       <p class="card-hint">Number of searches to run per session.</p>
       <div class="field-row">
@@ -73,10 +73,10 @@
     </section>
 
     <!-- Delay -->
-    <section class="card">
+    <section class="card" id="card-delay">
       <h2>
         Delay Between Searches
-        <span class="info-icon" tabindex="0" data-tooltip="Controls the pause between each search. A random delay within the min–max range makes your searches look more natural. Enable 'Fixed delay' to use one constant wait time instead.">i</span>
+        <span class="info-icon" tabindex="0" data-tooltip="How long to wait after each search before starting the next one. Fixed = same wait every time (e.g. 10s). Random = picks a random time between min and max (e.g. 10s–30s) to look more human.">i</span>
       </h2>
       <p class="card-hint">Wait time after each search completes.</p>
       <div class="field-row toggle-row">
@@ -103,10 +103,10 @@
     </section>
 
     <!-- Coffee break -->
-    <section class="card">
+    <section class="card" id="card-coffee">
       <h2>
         Coffee Break
-        <span class="info-icon" tabindex="0" data-tooltip="Inserts a longer pause after every N searches to mimic a real person taking a break. For example, every 5 searches the extension will wait 3–6 minutes before continuing. This makes the activity look more human-like.">i</span>
+        <span class="info-icon" tabindex="0" data-tooltip="Takes a longer pause after every few searches — like a real person stepping away. Example: after every 5 searches, pause for 3–6 minutes. This prevents rapid-fire patterns that look automated.">i</span>
       </h2>
       <p class="card-hint">Longer pause every N searches to look natural.</p>
       <div class="field-row toggle-row">
@@ -149,10 +149,10 @@
     </section>
 
     <!-- Behavior -->
-    <section class="card">
+    <section class="card" id="card-behavior">
       <h2>
         Behavior
-        <span class="info-icon" tabindex="0" data-tooltip="Fine-tune how the extension behaves. 'Google Trends' uses real trending topics as search queries. 'Scroll results' simulates reading the page. 'Include delay in reading time' overlaps the wait timer with scrolling so sessions finish faster.">i</span>
+        <span class="info-icon" tabindex="0" data-tooltip="Google Trends = uses real trending topics as search queries. Scroll = scrolls results like a real person reading. Include delay in reading = the wait timer runs during scrolling instead of after, making sessions faster.">i</span>
       </h2>
       <div class="field-row toggle-row">
         <div>
@@ -274,6 +274,20 @@
         <span class="whats-new-dot hidden" id="whats-new-dot"></span>
       </button>
     </footer>
+  </div>
+
+  <!-- Guided Tour Overlay -->
+  <div class="tour-overlay hidden" id="tour-overlay">
+    <div class="tour-backdrop" id="tour-backdrop"></div>
+    <div class="tour-popup" id="tour-popup">
+      <div class="tour-step-indicator" id="tour-step-indicator"></div>
+      <h3 class="tour-title" id="tour-title"></h3>
+      <p class="tour-desc" id="tour-desc"></p>
+      <div class="tour-actions">
+        <button class="tour-btn tour-btn--skip" id="tour-skip">Skip tour</button>
+        <button class="tour-btn tour-btn--next" id="tour-next">Next</button>
+      </div>
+    </div>
   </div>
 
   <script src="../scripts/config.js"></script>

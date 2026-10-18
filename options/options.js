@@ -287,8 +287,102 @@ document.getElementById('opt-pin-dismiss').addEventListener('click', () => {
   document.getElementById('opt-pin-banner').classList.add('hidden');
 });
 
+// ── Guided Tour ──
+const TOUR_STEPS = [
+  {
+    target: 'card-count',
+    title: 'Default Search Count',
+    desc: 'This sets how many searches the popup starts with by default. For example, set it to 35 and every time you open the popup, the slider will already be at 35. You can always change it before clicking "Bing it!"'
+  },
+  {
+    target: 'card-delay',
+    title: 'Delay Between Searches',
+    desc: 'After each search completes, the extension waits before doing the next one. "Fixed" means the same wait every time (e.g. 10 seconds). Turn it off for a random wait between a min and max value — this makes the pattern look more natural.'
+  },
+  {
+    target: 'card-coffee',
+    title: 'Coffee Break',
+    desc: 'This adds a longer pause after every few searches — like a real person taking a break. For example: after every 5 searches, wait 3–6 minutes. Great for making activity look less robotic. Disabled by default for faster sessions.'
+  },
+  {
+    target: 'card-behavior',
+    title: 'Behavior Settings',
+    desc: 'Google Trends pulls real trending topics as search queries, so your searches look diverse and current. Scroll simulates reading the results page. "Include delay in reading time" makes the delay timer run during scrolling so sessions finish faster.'
+  }
+];
+
+let tourStep = 0;
+let prevHighlight = null;
+
+function showTourStep(step) {
+  const overlay  = document.getElementById('tour-overlay');
+  const popup    = document.getElementById('tour-popup');
+  const titleEl  = document.getElementById('tour-title');
+  const descEl   = document.getElementById('tour-desc');
+  const indicator = document.getElementById('tour-step-indicator');
+  const nextBtn  = document.getElementById('tour-next');
+
+  if (prevHighlight) prevHighlight.classList.remove('tour-highlight');
+
+  if (step >= TOUR_STEPS.length) {
+    overlay.classList.add('hidden');
+    chrome.storage.local.set({ showTour: false });
+    return;
+  }
+
+  const s = TOUR_STEPS[step];
+  const target = document.getElementById(s.target);
+  if (!target) { showTourStep(step + 1); return; }
+
+  target.classList.add('tour-highlight');
+  prevHighlight = target;
+
+  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  titleEl.textContent = s.title;
+  descEl.textContent = s.desc;
+  nextBtn.textContent = step === TOUR_STEPS.length - 1 ? 'Got it!' : 'Next';
+
+  indicator.innerHTML = TOUR_STEPS.map((_, i) =>
+    `<div class="tour-dot ${i === step ? 'active' : ''}"></div>`
+  ).join('');
+
+  setTimeout(() => {
+    const rect = target.getBoundingClientRect();
+    const popupH = popup.offsetHeight;
+    let top = rect.bottom + 12;
+    if (top + popupH > window.innerHeight - 16) {
+      top = rect.top - popupH - 12;
+    }
+    top = Math.max(16, Math.min(top, window.innerHeight - popupH - 16));
+    popup.style.top = top + 'px';
+    popup.style.left = Math.max(16, (window.innerWidth - popup.offsetWidth) / 2) + 'px';
+  }, 350);
+}
+
+async function initTour() {
+  const { showTour } = await chrome.storage.local.get('showTour');
+  if (!showTour) return;
+
+  tourStep = 0;
+  document.getElementById('tour-overlay').classList.remove('hidden');
+  showTourStep(0);
+}
+
+document.getElementById('tour-next').addEventListener('click', () => {
+  tourStep++;
+  showTourStep(tourStep);
+});
+
+document.getElementById('tour-skip').addEventListener('click', () => {
+  if (prevHighlight) prevHighlight.classList.remove('tour-highlight');
+  document.getElementById('tour-overlay').classList.add('hidden');
+  chrome.storage.local.set({ showTour: false });
+});
+
 loadWhatsNew();
 loadPinBanner();
 loadUpdateBanner().then(hasUpdate => {
   if (!hasUpdate) loadRateBanner();
 });
+setTimeout(initTour, 600);
