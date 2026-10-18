@@ -5,17 +5,17 @@ const SETTINGS_KEY  = 'basSettings';
 
 const DEFAULT_SETTINGS = {
   defaultSearchCount: 30,
-  delayMinSec: 36,
-  delayMaxSec: 108,
-  delayFixed: false,
-  coffeeBreakEnabled: true,
+  delayMinSec: 10,
+  delayMaxSec: 10,
+  delayFixed: true,
+  coffeeBreakEnabled: false,
   coffeeBreakEvery: 5,
   coffeeBreakMinSec: 180,
   coffeeBreakMaxSec: 360,
   coffeeBreakFixed: false,
   useTrends: true,
   includeDelayInReading: false,
-  scrollEnabled: true
+  scrollEnabled: false
 };
 
 // ─── Utilities ───────────────────────────────────────────────
