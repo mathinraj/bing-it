@@ -21,7 +21,7 @@ Works on **Google Chrome** and **Microsoft Edge**
 <br><br>
 
 <img src="https://img.shields.io/badge/Manifest-V3-0c831f?style=flat-square" alt="Manifest V3">
-<img src="https://img.shields.io/badge/Version-1.5.1-1a1a2e?style=flat-square" alt="Version 1.5.1">
+<img src="https://img.shields.io/badge/Version-1.5.2-1a1a2e?style=flat-square" alt="Version 1.5.2">
 <img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="License">
 
 </div>
