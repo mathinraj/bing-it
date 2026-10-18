@@ -308,6 +308,11 @@ const TOUR_STEPS = [
     target: 'card-behavior',
     title: 'Behavior Settings',
     desc: 'Google Trends pulls real trending topics as search queries, so your searches look diverse and current. Scroll simulates reading the results page. "Include delay in reading time" makes the delay timer run during scrolling so sessions finish faster.'
+  },
+  {
+    target: 'card-feedback',
+    title: 'Feature Request / Bug Report',
+    desc: 'Got an idea for a new feature? Found a bug? Expand this section and send it directly to the developer. No account needed — just type your message and hit Send.'
   }
 ];
 
@@ -339,9 +344,12 @@ function showTourStep(step) {
 
   target.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
+  const backBtn = document.getElementById('tour-back');
+
   titleEl.textContent = s.title;
   descEl.textContent = s.desc;
-  nextBtn.textContent = step === TOUR_STEPS.length - 1 ? 'Got it!' : 'Next';
+  nextBtn.innerHTML = step === TOUR_STEPS.length - 1 ? 'Got it!' : 'Next &rarr;';
+  backBtn.classList.toggle('hidden', step === 0);
 
   indicator.innerHTML = TOUR_STEPS.map((_, i) =>
     `<div class="tour-dot ${i === step ? 'active' : ''}"></div>`
@@ -374,10 +382,24 @@ document.getElementById('tour-next').addEventListener('click', () => {
   showTourStep(tourStep);
 });
 
+document.getElementById('tour-back').addEventListener('click', () => {
+  if (tourStep > 0) {
+    tourStep--;
+    showTourStep(tourStep);
+  }
+});
+
 document.getElementById('tour-skip').addEventListener('click', () => {
   if (prevHighlight) prevHighlight.classList.remove('tour-highlight');
   document.getElementById('tour-overlay').classList.add('hidden');
   chrome.storage.local.set({ showTour: false });
+});
+
+document.getElementById('btn-retour').addEventListener('click', () => {
+  tourStep = 0;
+  document.getElementById('tour-overlay').classList.remove('hidden');
+  showTourStep(0);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
 loadWhatsNew();

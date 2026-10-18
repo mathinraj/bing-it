@@ -9,12 +9,21 @@
 <body>
   <div class="container">
     <header>
-      <div class="title-row">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-          <rect x="2" y="2" width="20" height="20" rx="4" fill="#1a1a2e"/>
-          <path d="M7 12l3 3 7-7" stroke="#ffe500" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <h1>Settings</h1>
+      <div class="header-top">
+        <div class="title-row">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="2" width="20" height="20" rx="4" fill="#1a1a2e"/>
+            <path d="M7 12l3 3 7-7" stroke="#ffe500" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <h1>Settings</h1>
+        </div>
+        <button class="tour-trigger" id="btn-retour" title="Take a guided tour">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          Tour
+        </button>
       </div>
       <p class="subtitle">bing it v1.5</p>
     </header>
@@ -58,10 +67,10 @@
 
     <!-- Default Search Count -->
     <section class="card" id="card-count">
-      <h2>
-        Default Search Count
+      <div class="card-header">
+        <h2>Default Search Count</h2>
         <span class="info-icon" tabindex="0" data-tooltip="Sets the starting number in the popup slider. Example: set to 35, and the popup will default to 35 searches every time you open it. You can always change it before clicking 'Bing it!'">i</span>
-      </h2>
+      </div>
       <p class="card-hint">Number of searches to run per session.</p>
       <div class="field-row">
         <label>Count</label>
@@ -74,10 +83,10 @@
 
     <!-- Delay -->
     <section class="card" id="card-delay">
-      <h2>
-        Delay Between Searches
+      <div class="card-header">
+        <h2>Delay Between Searches</h2>
         <span class="info-icon" tabindex="0" data-tooltip="How long to wait after each search before starting the next one. Fixed = same wait every time (e.g. 10s). Random = picks a random time between min and max (e.g. 10s–30s) to look more human.">i</span>
-      </h2>
+      </div>
       <p class="card-hint">Wait time after each search completes.</p>
       <div class="field-row toggle-row">
         <label for="delayFixed">Fixed delay (no randomization)</label>
@@ -104,10 +113,10 @@
 
     <!-- Coffee break -->
     <section class="card" id="card-coffee">
-      <h2>
-        Coffee Break
+      <div class="card-header">
+        <h2>Coffee Break</h2>
         <span class="info-icon" tabindex="0" data-tooltip="Takes a longer pause after every few searches — like a real person stepping away. Example: after every 5 searches, pause for 3–6 minutes. This prevents rapid-fire patterns that look automated.">i</span>
-      </h2>
+      </div>
       <p class="card-hint">Longer pause every N searches to look natural.</p>
       <div class="field-row toggle-row">
         <label for="coffeeEnabled">Enable coffee break</label>
@@ -150,10 +159,10 @@
 
     <!-- Behavior -->
     <section class="card" id="card-behavior">
-      <h2>
-        Behavior
+      <div class="card-header">
+        <h2>Behavior</h2>
         <span class="info-icon" tabindex="0" data-tooltip="Google Trends = uses real trending topics as search queries. Scroll = scrolls results like a real person reading. Include delay in reading = the wait timer runs during scrolling instead of after, making sessions faster.">i</span>
-      </h2>
+      </div>
       <div class="field-row toggle-row">
         <div>
           <label for="useTrends">Use Google Trends queries</label>
@@ -187,7 +196,7 @@
     </section>
 
     <!-- Feature Request -->
-    <section class="card">
+    <section class="card" id="card-feedback">
       <div class="fr-toggle" id="fr-toggle">
         <h2>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -285,7 +294,10 @@
       <p class="tour-desc" id="tour-desc"></p>
       <div class="tour-actions">
         <button class="tour-btn tour-btn--skip" id="tour-skip">Skip tour</button>
-        <button class="tour-btn tour-btn--next" id="tour-next">Next</button>
+        <div class="tour-nav">
+          <button class="tour-btn tour-btn--back hidden" id="tour-back">&larr;</button>
+          <button class="tour-btn tour-btn--next" id="tour-next">Next &rarr;</button>
+        </div>
       </div>
     </div>
   </div>
