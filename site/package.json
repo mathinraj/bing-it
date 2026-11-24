@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npx serve .",
-    "build": "echo 'Static site — no build step needed'"
+    "minify": "npx --yes esbuild@0.24.0 site.css --bundle --minify --external:/fonts/* --outfile=site.min.css && cat scrollcraft.js bingit.js | npx --yes esbuild@0.24.0 --minify --loader=js --target=es2017 > site.min.js",
+    "build": "echo 'Static site — no build step needed. Run npm run minify after editing CSS or JS.'"
   }
 }

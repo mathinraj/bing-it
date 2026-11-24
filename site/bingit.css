@@ -41,6 +41,20 @@
 }
 
 body { font-feature-settings: "ss01"; }
+
+/* The engine sizes pinned acts and sticks their stages in JS. Doing the same
+   here first means the page paints at its final layout. Heights must equal
+   data-sc-span × 100vh on each act. */
+#newtab { height: 170vh; }
+#session { height: 520vh; }
+#history { height: 340vh; }
+#install { height: 125vh; }
+main > [data-sc-act]:not([data-sc-act="flow"]) > [data-sc-stage] {
+  position: sticky; top: 0;
+  height: 100vh; height: 100svh;
+  overflow: clip;
+  z-index: var(--sc-z-stage);
+}
 :where(button) { cursor: pointer; }
 .chrome :focus-visible, .tour :focus-visible, .dt :focus-visible { outline-color: var(--brand); }
 
@@ -260,9 +274,9 @@ body { font-feature-settings: "ss01"; }
 .bas__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .bas__brand { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: #94a3b8; }
 .bas__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--bas-dot, var(--bas-c)); }
-.bas__x { font-size: 16px; line-height: 1; color: #64748b; }
+.bas__x { font-size: 16px; line-height: 1; color: #8592a6; }
 .bas__row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; font-size: 11px; color: #94a3b8; font-variant-numeric: tabular-nums; }
-.bas__row > :last-child { font-size: 10px; color: #64748b; }
+.bas__row > :last-child { font-size: 10px; }
 .bas__track { height: 4px; margin-bottom: 12px; border-radius: 2px; background: rgb(255 255 255 / 0.06); overflow: hidden; }
 .bas__track i { display: block; height: 100%; background: linear-gradient(90deg, var(--o-cyan), #22d3ee); transform: scaleX(0); transform-origin: 0 50%; }
 .bas__time { margin-bottom: 6px; font-size: 28px; font-weight: 700; line-height: 1; color: var(--bas-c); font-variant-numeric: tabular-nums; }
@@ -285,6 +299,7 @@ body { font-feature-settings: "ss01"; }
   letter-spacing: -0.055em; color: #E6E0C6;
   font-variant-numeric: tabular-nums;
 }
+.nt__clock span::before { content: attr(data-time); }
 .nt__search {
   left: 41vw; right: var(--inset); margin-inline: auto;
   top: calc(var(--top) + 12vh + min(17rem, 17vw) * 0.9);
@@ -340,7 +355,7 @@ body { font-feature-settings: "ss01"; }
 .dt__meta { margin: 0; font-size: 11.5px; color: #918EA0; }
 .dt__stats { margin: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
 .dt__stats div { padding: 8px 10px; border-radius: 8px; background: #2C2B36; }
-.dt__stats dt { font-size: 10.5px; color: #918EA0; }
+.dt__stats dt { font-size: 10.5px; color: #A6A3B5; }
 .dt__stats dd { margin: 2px 0 0; font-size: 16px; font-weight: 650; color: #F3F1F8; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .dt__lane { flex: none; padding: 10px 10px 8px; border-radius: 10px; background: #1A1922; }
 .dt__lane-l { display: block; margin-bottom: 8px; font-size: 10.5px; color: #918EA0; }

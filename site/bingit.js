@@ -641,7 +641,8 @@
   addEventListener('resize', function () { layout(); frame(); }, { passive: true });
 
   // the clock on the new tab is the visitor's own
-  function tickClock() { $('#nt-time').textContent = clockText(new Date()); }
+  var clock = $('#nt-time');
+  function tickClock() { clock.setAttribute('data-time', clockText(new Date())); }
   tickClock();
   setInterval(tickClock, 15000);
 

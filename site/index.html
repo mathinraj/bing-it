@@ -39,11 +39,10 @@
   </script>
 
   <link rel="icon" type="image/svg+xml" href="/icon.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Geist:wght@400..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/scrollcraft.css">
-  <link rel="stylesheet" href="/bingit.css">
+  <link rel="preload" href="/fonts/bricolage-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/site.min.css">
+  <script defer src="/site.min.js"></script>
 </head>
 <body>
 
@@ -98,9 +97,9 @@
 
 <!-- The guided tour. Same idiom as the tour on the extension's own options page. -->
 <div class="tour" id="tour" data-step="hero">
-  <div class="tour__dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="tour__dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i><i></i><i></i><i></i></div>
 
-  <section class="tour__step tour__step--hero" data-step="hero" aria-labelledby="t-hero">
+  <section class="tour__step tour__step--hero is-on" data-step="hero" aria-labelledby="t-hero">
     <h1 id="t-hero" class="tour__h1">The Bing auto searcher that types like a person.</h1>
     <p class="tour__p">Pick a number and press go. It types, reads and takes breaks in a background tab, using today's Google Trends.</p>
     <div class="tour__actions">
@@ -165,7 +164,11 @@
   <!-- 1 · New tab: the popup is already open and set -->
   <section id="newtab" class="act act--newtab" data-sc-act="pin" data-sc-span="1.7">
     <div data-sc-stage class="page page--newtab">
-      <div class="nt__clock" data-sc-parallax="-1.6" aria-hidden="true"><span id="nt-time">9:41</span></div>
+      <div class="nt__clock" data-sc-parallax="-1.6" aria-hidden="true"><span id="nt-time" data-time=""></span></div>
+      <script>
+        document.getElementById('nt-time').setAttribute('data-time', new Intl.DateTimeFormat([], { hour: 'numeric', minute: '2-digit' })
+          .formatToParts(new Date()).filter(function (p) { return p.type !== 'dayPeriod'; }).map(function (p) { return p.value; }).join('').trim());
+      </script>
       <div class="nt__search" data-sc-parallax="-0.7" aria-hidden="true">
         <svg><use href="#i-search"/></svg><span>Search or type a URL</span>
       </div>
@@ -390,8 +393,6 @@
 
 </main>
 
-<script src="/scrollcraft.js"></script>
-<script src="/bingit.js"></script>
 <script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
