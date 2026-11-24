@@ -2,411 +2,153 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Feedback — Bing it</title>
   <meta name="description" content="Report bugs, request features, or share feedback about the Bing it extension.">
   <meta name="theme-color" content="#ffe500">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'><rect width='128' height='128' rx='26' fill='%23FFE500'/><path d='M36 66L52 82L92 42' stroke='%231a1a2e' stroke-width='12' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>">
+  <link rel="icon" type="image/svg+xml" href="/icon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Geist:wght@400..700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/scrollcraft.css">
+  <link rel="stylesheet" href="/bingit.css">
   <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    .fb { min-height: 100vh; padding: calc(var(--top) + 7vh) calc(var(--inset) + 24px) 12vh; background: #F3F2EE; }
+    .fb__wrap { max-width: 640px; margin: 0 auto; }
+    .fb__head h1 { margin: 0; font: 700 clamp(2.3rem, 4vw, 3.2rem)/1 var(--sc-font-display); letter-spacing: -0.035em; }
+    .fb__head p { margin: 12px 0 0; font-size: 16px; color: var(--sc-ink-soft); max-width: 52ch; }
+    .fb__head { margin-bottom: 32px; }
 
-    :root {
-      --bg: #fafafa;
-      --bg-card: #ffffff;
-      --text: #1a1a2e;
-      --text-dim: #6b7280;
-      --brand: #ffe500;
-      --brand-dark: #e6cf00;
-      --accent: #0c831f;
-      --accent-light: rgba(12,131,31,.08);
-      --danger: #e23744;
-      --warning: #f59e0b;
-      --purple: #6c5ce7;
-      --border: #e5e7eb;
-      --radius: 12px;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
-      --shadow-md: 0 4px 20px rgba(0,0,0,.08);
-    }
+    .uninstall { display: none; margin-bottom: 28px; padding: 18px 20px; border-radius: 14px; background: var(--brand); color: var(--ink); }
+    .uninstall.visible { display: block; }
+    .uninstall h3 { margin: 0 0 4px; font: 700 1.15rem/1.2 var(--sc-font-display); letter-spacing: -0.015em; }
+    .uninstall p { margin: 0; font-size: 14px; }
 
-    html { scroll-behavior: smooth; }
+    .fb__card { padding: 24px; border-radius: 16px; background: #fff; box-shadow: 0 1px 2px rgb(40 36 20 / 0.06), 0 14px 34px -16px rgb(40 36 20 / 0.24); }
+    .types { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 24px; padding: 4px; border-radius: 12px; background: #F1F0EB; }
+    .type-btn { display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; border: 0; border-radius: 9px; background: transparent; color: var(--sc-ink-soft); font: 600 14px var(--sc-font-text); transition: background-color 150ms var(--sc-ease-out), color 150ms var(--sc-ease-out), transform 100ms var(--sc-ease-out); }
+    .type-btn svg { width: 17px; height: 17px; }
+    @media (hover: hover) and (pointer: fine) { .type-btn:hover { color: var(--ink); } }
+    .type-btn:active { transform: scale(0.97); }
+    .type-btn.selected { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgb(40 36 20 / 0.12), 0 2px 8px -2px rgb(40 36 20 / 0.12); }
 
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      min-height: 100vh;
-    }
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; }
+    .form-input { width: 100%; padding: 12px 14px; border: 1px solid #DCDAD2; border-radius: 10px; background: #FAFAF7; color: var(--ink); font: 15px/1.5 var(--sc-font-text); transition: border-color 140ms var(--sc-ease-out); }
+    .form-input:hover { border-color: #C8C5BB; }
+    .form-input:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; border-color: var(--ink); }
+    .form-input::placeholder { color: #8A877E; }
+    textarea.form-input { min-height: 140px; resize: vertical; }
+    .form-input.error { border-color: #e23744; }
+    .form-error { margin: 6px 0 0; font-size: 13px; color: #c62f3b; }
 
-    /* ── Nav ─────────────────────────── */
-    nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      background: rgba(255,255,255,.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 24px;
-    }
-    .nav-inner {
-      max-width: 700px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 64px;
-    }
-    .nav-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      color: var(--text);
-    }
-    .nav-brand span {
-      font-size: 20px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-    }
-    .nav-back {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-dim);
-      text-decoration: none;
-      transition: color .2s;
-    }
-    .nav-back:hover { color: var(--text); }
+    .btn-submit { display: flex; align-items: center; justify-content: center; gap: 9px; width: 100%; height: 50px; border: 0; border-radius: 12px; background: var(--ink); color: var(--brand); font: 650 15px var(--sc-font-text); transition: background-color 150ms var(--sc-ease-out), transform 100ms var(--sc-ease-out); }
+    .btn-submit svg { width: 16px; height: 16px; }
+    @media (hover: hover) and (pointer: fine) { .btn-submit:hover:not(:disabled) { background: #2A2934; } }
+    .btn-submit:active { transform: scale(0.98); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-submit:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 
-    /* ── Main ────────────────────────── */
-    main {
-      max-width: 700px;
-      margin: 0 auto;
-      padding: 100px 24px 60px;
-    }
+    .success { text-align: center; padding: 48px 24px; }
+    .success__icon { display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto 20px; border-radius: 50%; background: var(--brand); }
+    .success__icon svg { width: 28px; height: 28px; }
+    .success h2 { margin: 0 0 8px; font: 700 1.6rem/1.1 var(--sc-font-display); letter-spacing: -0.02em; }
+    .success p { margin: 0 auto 24px; max-width: 40ch; font-size: 15px; color: var(--sc-ink-soft); }
+    .btn-outline { height: 44px; padding: 0 20px; border: 0; border-radius: 10px; background: #F1F0EB; color: var(--ink); font: 600 14px var(--sc-font-text); }
+    .btn-outline:hover { background: #E7E5DE; }
 
-    .page-header {
-      margin-bottom: 32px;
-    }
-    .page-header h1 {
-      font-size: 1.75rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      margin-bottom: 8px;
-    }
-    .page-header p {
-      font-size: 15px;
-      color: var(--text-dim);
-    }
+    .fb__foot { margin-top: 28px; font-size: 13px; color: var(--sc-ink-soft); }
+    .fb__foot a { color: var(--ink); font-weight: 600; }
 
-    /* ── Uninstall banner ────────────── */
-    .uninstall-banner {
-      background: linear-gradient(135deg, #fff9db 0%, #fff3bf 100%);
-      border: 1px solid var(--brand-dark);
-      border-radius: var(--radius);
-      padding: 20px 24px;
-      margin-bottom: 28px;
-      display: none;
-    }
-    .uninstall-banner.visible { display: block; }
-    .uninstall-banner h3 {
-      font-size: 15px;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-    .uninstall-banner p {
-      font-size: 13px;
-      color: var(--text-dim);
-    }
-
-    /* ── Type picker ─────────────────── */
-    .type-picker {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-    .type-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      padding: 16px 12px;
-      background: var(--bg-card);
-      border: 2px solid var(--border);
-      border-radius: var(--radius);
-      cursor: pointer;
-      transition: all .2s;
-      font-family: inherit;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-dim);
-    }
-    .type-btn:hover { border-color: #d1d5db; }
-    .type-btn.selected { color: var(--text); }
-    .type-btn[data-type="bug"].selected {
-      border-color: var(--danger);
-      background: rgba(226,55,68,.04);
-    }
-    .type-btn[data-type="feature"].selected {
-      border-color: var(--warning);
-      background: rgba(245,158,11,.04);
-    }
-    .type-btn[data-type="feedback"].selected {
-      border-color: var(--purple);
-      background: rgba(108,92,231,.04);
-    }
-    .type-icon {
-      font-size: 22px;
-      line-height: 1;
-    }
-
-    /* ── Form ────────────────────────── */
-    .form-group {
-      margin-bottom: 20px;
-    }
-    .form-label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 8px;
-    }
-    .form-input {
-      width: 100%;
-      padding: 12px 16px;
-      font-family: inherit;
-      font-size: 14px;
-      color: var(--text);
-      background: var(--bg-card);
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      outline: none;
-      transition: border-color .2s, box-shadow .2s;
-    }
-    .form-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(12,131,31,.08);
-    }
-    .form-input::placeholder { color: #9ca3af; }
-    textarea.form-input {
-      resize: vertical;
-      min-height: 120px;
-      line-height: 1.6;
-    }
-    .form-input.error {
-      border-color: var(--danger);
-    }
-    .form-error {
-      font-size: 12px;
-      color: var(--danger);
-      margin-top: 6px;
-    }
-
-    /* ── Submit button ────────────────── */
-    .btn-submit {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      padding: 14px;
-      font-family: inherit;
-      font-size: 15px;
-      font-weight: 700;
-      color: #fff;
-      background: var(--accent);
-      border: none;
-      border-radius: var(--radius);
-      cursor: pointer;
-      transition: background .2s, transform .1s, box-shadow .2s;
-      box-shadow: 0 4px 12px rgba(12,131,31,.2);
-    }
-    .btn-submit:hover:not(:disabled) {
-      background: #0a6e1a;
-      transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(12,131,31,.3);
-    }
-    .btn-submit:active { transform: scale(.98); }
-    .btn-submit:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    /* ── Success state ────────────────── */
-    .success-card {
-      text-align: center;
-      padding: 48px 24px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: var(--shadow-md);
-    }
-    .success-icon {
-      width: 64px;
-      height: 64px;
-      margin: 0 auto 20px;
-      border-radius: 50%;
-      background: var(--accent-light);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-    }
-    .success-card h2 {
-      font-size: 1.25rem;
-      font-weight: 800;
-      margin-bottom: 8px;
-    }
-    .success-card p {
-      font-size: 14px;
-      color: var(--text-dim);
-      margin-bottom: 24px;
-    }
-    .btn-outline {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 24px;
-      font-family: inherit;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--accent);
-      background: transparent;
-      border: 2px solid var(--accent);
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background .2s;
-    }
-    .btn-outline:hover { background: var(--accent-light); }
-
-    /* ── Toast ────────────────────────── */
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      padding: 12px 24px;
-      background: var(--text);
-      color: #fff;
-      font-size: 13px;
-      font-weight: 600;
-      border-radius: 10px;
-      box-shadow: 0 8px 24px rgba(0,0,0,.2);
-      opacity: 0;
-      transition: opacity .3s, transform .3s;
-      pointer-events: none;
-      z-index: 1000;
-    }
-    .toast.visible {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-    .toast.error { background: var(--danger); }
-
-    /* ── Footer ───────────────────────── */
-    footer {
-      text-align: center;
-      padding: 24px;
-      font-size: 12px;
-      color: var(--text-dim);
-    }
-    footer a {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 600;
-    }
-    footer a:hover { text-decoration: underline; }
-
-    /* ── Responsive ───────────────────── */
-    @media (max-width: 520px) {
-      .type-picker { grid-template-columns: 1fr; }
-      main { padding: 90px 16px 40px; }
-    }
-
+    .toast { position: fixed; left: 50%; bottom: calc(var(--inset) + 24px); z-index: 90; padding: 12px 20px; border-radius: 10px; background: var(--ink); color: #fff; font-size: 14px; font-weight: 600; box-shadow: 0 8px 24px rgb(0 0 0 / 0.25); opacity: 0; transform: translate(-50%, 12px); transition: opacity 200ms var(--sc-ease-out), transform 200ms var(--sc-ease-out); pointer-events: none; }
+    .toast.visible { opacity: 1; transform: translate(-50%, 0); }
+    .toast.error { background: #c62f3b; }
     .hidden { display: none !important; }
+
+    @media (max-width: 560px) {
+      .types { grid-template-columns: 1fr; }
+      .fb { padding: calc(var(--top) + 24px) calc(var(--inset) + 12px) 10vh; }
+      .fb__card { padding: 18px; }
+    }
   </style>
 </head>
 <body>
-  <nav>
-    <div class="nav-inner">
-      <a href="/" class="nav-brand">
-        <svg width="28" height="28" viewBox="0 0 128 128">
-          <rect width="128" height="128" rx="26" fill="#FFE500"/>
-          <path d="M36 66L52 82L92 42" stroke="#1a1a2e" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-        </svg>
-        <span>bing it</span>
-      </a>
-      <a href="/" class="nav-back">&larr; Back to home</a>
-    </div>
-  </nav>
+  <div class="desk" aria-hidden="true"></div>
 
-  <main>
-    <!-- Uninstall banner (shown via ?ref=uninstall) -->
-    <div class="uninstall-banner" id="uninstallBanner">
-      <h3>We're sorry to see you go!</h3>
-      <p>Would you take a moment to let us know why you uninstalled? Your feedback helps us improve.</p>
+  <header class="chrome">
+    <div class="chrome__strip">
+      <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+      <nav class="tabs" aria-label="Site" tabindex="-1">
+        <a class="tab" href="/"><svg class="tab__ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="4" fill="#16151d"/><path d="M7 12l3 3 7-7" stroke="#ffe500" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span class="tab__t">bing it</span></a>
+        <a class="tab" href="/feedback" aria-current="page"><svg class="tab__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span class="tab__t">Feedback</span></a>
+      </nav>
     </div>
-
-    <div class="page-header">
-      <h1>Send Feedback</h1>
-      <p>Found a bug? Have a feature idea? Or just want to say something? We'd love to hear from you.</p>
+    <div class="chrome__bar">
+      <div class="omnibox"><svg class="omnibox__ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg><span class="omnibox__url">bingit.vercel.app/feedback</span></div>
+      <a class="ext" href="/" aria-label="bing it home"><svg class="ext__ic" viewBox="0 0 128 128" aria-hidden="true"><rect width="128" height="128" rx="26" fill="#FFE500"/><path d="M36 66L52 82L92 42" stroke="#16151d" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></a>
     </div>
+  </header>
 
-    <!-- Form -->
-    <form id="feedbackForm">
-      <div class="type-picker">
-        <button type="button" class="type-btn selected" data-type="bug">
-          <span class="type-icon">&#128027;</span>
-          Bug Report
-        </button>
-        <button type="button" class="type-btn" data-type="feature">
-          <span class="type-icon">&#128161;</span>
-          Feature Request
-        </button>
-        <button type="button" class="type-btn" data-type="feedback">
-          <span class="type-icon">&#128172;</span>
-          General Feedback
-        </button>
+  <main class="fb">
+    <div class="fb__wrap">
+      <div class="uninstall" id="uninstallBanner">
+        <h3>Sorry to see you go.</h3>
+        <p>Would you tell us why you uninstalled? It helps make the next version better.</p>
       </div>
 
-      <div class="form-group">
-        <label class="form-label" id="msgLabel">Describe the issue</label>
-        <textarea class="form-input" id="message" placeholder="What happened? What did you expect to happen?" rows="5" required></textarea>
+      <div class="fb__head page-header">
+        <h1>Send feedback</h1>
+        <p>Found a bug, have an idea, or just want to say something? It all goes straight to the developer.</p>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Email (optional)</label>
-        <input type="email" class="form-input" id="email" placeholder="your@email.com — only if you'd like a reply">
-        <p class="form-error hidden" id="emailError">Please enter a valid email address</p>
+      <div class="fb__card">
+        <form id="feedbackForm">
+          <div class="types" role="group" aria-label="Feedback type">
+            <button type="button" class="type-btn selected" data-type="bug">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6a4 4 0 0 1 8 0M6 10h12v4a6 6 0 0 1-12 0zM12 10v10M3 13h3M18 13h3M4 7l3 3M20 7l-3 3M4 19l3-2M20 19l-3-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Bug report
+            </button>
+            <button type="button" class="type-btn" data-type="feature">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Feature request
+            </button>
+            <button type="button" class="type-btn" data-type="feedback">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+              General
+            </button>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" id="msgLabel" for="message">Describe the issue</label>
+            <textarea class="form-input" id="message" placeholder="What happened? What did you expect to happen?" rows="5" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="email">Email (optional)</label>
+            <input type="email" class="form-input" id="email" placeholder="your@email.com, only if you'd like a reply">
+            <p class="form-error hidden" id="emailError">Please enter a valid email address</p>
+          </div>
+
+          <button type="submit" class="btn-submit" id="submitBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Send feedback
+          </button>
+        </form>
+
+        <div class="success hidden" id="successCard">
+          <div class="success__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#16151d" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h2>Feedback sent.</h2>
+          <p>Thank you for taking the time. It helps make bing it better.</p>
+          <button type="button" class="btn-outline" id="resetBtn">Send another</button>
+        </div>
       </div>
 
-      <button type="submit" class="btn-submit" id="submitBtn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        Send Feedback
-      </button>
-    </form>
-
-    <!-- Success -->
-    <div class="success-card hidden" id="successCard">
-      <div class="success-icon">&#10003;</div>
-      <h2>Feedback Sent!</h2>
-      <p>Thank you for taking the time to share your thoughts. It helps make Bing it better.</p>
-      <button type="button" class="btn-outline" id="resetBtn">Send Another</button>
+      <p class="fb__foot">Built by <a href="https://mathinraj.is-a.dev" target="_blank" rel="noopener">Mathinraj</a> · <a href="/">Back to bing it</a></p>
     </div>
   </main>
 
-  <footer>
-    <p>Built by <a href="https://mathinraj.is-a.dev" target="_blank">Mathinraj</a></p>
-  </footer>
+  <div class="toast" id="toast" role="status"></div>
 
-  <div class="toast" id="toast"></div>
-
-  <!-- Vercel Analytics -->
   <script defer src="/_vercel/insights/script.js"></script>
 
   <script>
@@ -436,9 +178,11 @@
     }
 
     typeBtns.forEach(btn => {
+      btn.setAttribute('aria-pressed', btn.classList.contains('selected'));
       btn.addEventListener('click', () => {
-        typeBtns.forEach(b => b.classList.remove('selected'));
+        typeBtns.forEach(b => { b.classList.remove('selected'); b.setAttribute('aria-pressed', 'false'); });
         btn.classList.add('selected');
+        btn.setAttribute('aria-pressed', 'true');
         selectedType = btn.dataset.type;
         updateLabel();
       });
@@ -470,6 +214,8 @@
       return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(val);
     }
 
+    const sendIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const msg = msgInput.value.trim();
@@ -487,7 +233,7 @@
       emailInput.classList.remove('error');
 
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Sending...';
+      submitBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Sending...';
 
       const typeLabels = { bug: 'Bug Report', feature: 'Feature Request', feedback: 'General Feedback' };
       const source = params.get('ref') === 'uninstall' ? ' [Uninstall Feedback]' : '';
@@ -516,7 +262,7 @@
       }
 
       submitBtn.disabled = false;
-      submitBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send Feedback';
+      submitBtn.innerHTML = sendIcon + ' Send feedback';
     });
 
     resetBtn.addEventListener('click', () => {
