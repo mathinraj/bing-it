@@ -133,6 +133,21 @@ async function clearState() {
   chrome.action.setBadgeText({ text: '' });
 }
 
+// A finished session only stays on screen for the day it finished on.
+// After local midnight the popup goes back to the setup view.
+function isFromEarlierDay(ts) {
+  return new Date(ts).toDateString() !== new Date().toDateString();
+}
+
+async function getCurrentState() {
+  const s = await getState();
+  if (s && s.status === 'complete' && isFromEarlierDay(s.finishedAt || s.startTime)) {
+    await clearState();
+    return null;
+  }
+  return s;
+}
+
 // ─── Badge ───────────────────────────────────────────────────
 
 function badge(cur, total, color = '#06b6d4') {
@@ -456,6 +471,7 @@ async function finishSession() {
     state.isRunning = false;
     state.status = 'complete';
     state.nextSearchAt = null;
+    state.finishedAt = Date.now();
     await setState(state);
   }
   chrome.action.setBadgeText({ text: '\u2713' });
@@ -488,7 +504,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
       stopSession().then(() => sendResponse({ ok: true }));
       return true;
     case 'getState':
-      getState().then(s => sendResponse(s));
+      getCurrentState().then(s => sendResponse(s));
       return true;
     case 'openOptions':
       chrome.runtime.openOptionsPage();

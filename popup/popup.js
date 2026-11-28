@@ -110,7 +110,7 @@ $('#openSettings').addEventListener('click', e => {
 
 // ── Render ──
 function render(state) {
-  if (!state) { showView('setup'); return; }
+  if (!state) { showView('setup'); elStartBtn.disabled = false; return; }
 
   if (state.status === 'complete') {
     showView('done');
